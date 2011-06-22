@@ -365,19 +365,28 @@ LIB = {
 	parseTemplates : function(template_txt) {
 		var xmp = cE("div", {html: LIB.trim(template_txt)}).firstChild,
 			preload_templates = ['header', 'home', 'sidebar', 'tumblog', 'footer'],
-			id, c;
+			id, c, fn;
 		
 		// later, use this (cause it's faster), when html entities are parsed into their utf-8 componenets...
 		// though, maybe it'd be better to just send the templates in js form...
 		//var d = new DOMParser().parseFromString("<x>"+LOADER.templates+"</x>", 'text/xml')
 		do {
-			id = xmp.id;
-			if(typeof SKIN.templates[id] !== 'function') {
-				c = xmp.innerHTML;
-				if(!DEBUG && preload_templates.indexOf(id) === -1) {
-					SKIN.templates_txt[id] = c;
-				} else {
-					SKIN.get_template(id, c);
+			if(xmp.nodeName === "XMP") {
+				id = xmp.id;
+				fn = xmp.getAttribute("load");
+				
+				if(fn) {
+					fn = new Function("return "+fn);
+					STATEMANAGER.intercept[id] = fn();
+				}
+				
+				if(typeof SKIN.templates[id] !== 'function') {
+					c = xmp.innerHTML;
+					if(!DEBUG && preload_templates.indexOf(id) === -1) {
+						SKIN.templates_txt[id] = c;
+					} else {
+						SKIN.get_template(id, c);
+					}
 				}
 			}
 		} while(xmp = xmp.nextSibling);

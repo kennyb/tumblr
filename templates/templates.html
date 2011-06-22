@@ -37,33 +37,10 @@
 </xmp>
 
 
-<xmp id="tumblr">
-	<?
-	var params = d.args || [],
-		type = params[0] || 'photo',
-		user = params[1] || TUMBLR.user,
-		reset = false;
-	
-	if(type && type !== TUMBLR.type) {
-		TUMBLR.type = params[0];
-		reset = true;
-	}
-	
-	if(user && user !== TUMBLR.user) {
-		TUMBLR.user = params[1];
-		reset = true;
-	}
-	
-	console.log("pasando por aqui");
-	if(reset) {
-		TUMBLR.posts = [];
-		TUMBLR.total = -1;
-		/*
-		SKIN.renderPanel('tumblr');
-		SKIN.setWindowTitle("tumblr test");
-		*/
-	}
-	?>
+<xmp id="tumblr" load="TUMBLR.load">
+	<div>
+		shit can go here...
+	</div>
 	<div>
 		<?=SKIN.gallery({
 			template: 'tumblr_gallery',
@@ -71,6 +48,7 @@
 			pager: 'pager',
 			page_offset: 0,
 			page_size: 1,
+			controller: TUMBLR.gallery_control,
 			fetch: TUMBLR.fetch,
 			render: TUMBLR.render
 		})?>
@@ -86,7 +64,7 @@
 		<button onclick="<?=d.pager_start()?>"><?="|<<"?></button>
 		<button onclick="<?=d.pager_back()?>"><?="<<"?></button>
 		<?=SKIN.global('tumblr.cur')?> of <?=SKIN.global('tumblr.total')?>
-		<button onclick="<?=console.log(d) && d.pager_forward()?>"><?=">>"?></button>
+		<button onclick="<?=d.pager_forward()?>"><?=">>"?></button>
 		<button onclick="<?=d.pager_end()?>"><?=">>|"?></button>
 	</div>
 	<div>

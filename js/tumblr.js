@@ -70,9 +70,13 @@ TUMBLR = {
 	render_callback: null,
 	callback_offset: -1,
 	block_size: 2,
-	load : function(params) {
-		console.log("TUMBLR.load", params);
-		/*
+	gallery: null,
+	gallery_control : function(gallery) {
+		console.log("TUMBLR.gallery_control", gallery);
+		TUMBLR.gallery = gallery;
+	},
+	load : function(panel, params) {
+		console.log("TUMBLR.load - ", params);
 		var type = params[0] || TUMBLR.type,
 			user = params[1] || TUMBLR.user,
 			reset = false;
@@ -93,8 +97,44 @@ TUMBLR = {
 			//SKIN.renderPanel('tumblr');
 			//SKIN.setWindowTitle("tumblr test");
 			//MENU.selectItem($('sm'+type));
-			SKIN.resize();
+			//SKIN.resize();
 		}
+		
+		if(SKIN.global_exists("gallery.tumblr_gallery")) {
+			TUMBLR.fetch(reset ? 0 : TUMBLR.gallery.page_offset, TUMBLR.gallery.page_size, TUMBLR.gallery.render);
+		} else {
+			SKIN.template("tumblr", {args: params}, $_('content'));
+		}
+		
+		/*
+		// --------
+		// inside template
+		// --------
+		
+		var params = d.args || [],
+			type = params[0] || 'photo',
+			user = params[1] || TUMBLR.user,
+			reset = false;
+
+		if(type && type !== TUMBLR.type) {
+			TUMBLR.type = params[0];
+			reset = true;
+		}
+
+		if(user && user !== TUMBLR.user) {
+			TUMBLR.user = params[1];
+			reset = true;
+		}
+
+		console.log("pasando por aqui");
+		if(reset) {
+			TUMBLR.posts = [];
+			TUMBLR.total = -1;
+			//SKIN.renderPanel('tumblr');
+			//SKIN.setWindowTitle("tumblr test");
+		}
+		
+		
 		*/
 	},
 	render : function(page_offset, page_size, posts) {
@@ -107,9 +147,11 @@ TUMBLR = {
 		}
 	},
 	fetch : function(page_offset, page_size, data_callback, force) {
-		console.log("TUMBLR.fetch", page_offset, page_size, data_callback);
 		var posts = TUMBLR.posts.slice(page_offset, page_offset + page_size);
+		console.log("TUMBLR.fetch", page_offset, page_size, posts.length, data_callback);
+		
 		if(posts.length === page_size) {
+			//TODO: check to see if it's null or not, and if it isn't null, then show it, otherwise get a block
 			data_callback(page_offset, page_size, posts);
 		} else if(!force) {
 			// preload
@@ -117,7 +159,7 @@ TUMBLR = {
 				console.log("GET1", page_offset, page_size);
 				TUMBLR.get(page_offset, page_size, function(data) {
 					console.log("TUMBLR.get", data);
-					TUMBLR.fetch(page_offset, page_size, data_callback, 1);
+					TUMBLR.fetch(page_offset, page_size, data_callback, true);
 				});
 			}
 		}
@@ -158,7 +200,7 @@ TUMBLR = {
 		var posts = d.posts,
 			offset = TUMBLR.callback_offset,
 			end = posts.length + offset,
-			i = 0, j = 0;
+			i = offset, j = 0;
 		
 		console.log("TUMBLR.fetchback");
 		TUMBLR.callback_offset = -1;
@@ -171,15 +213,21 @@ TUMBLR = {
 			while(TUMBLR.total < d["posts-total"]) {
 				TUMBLR.posts.unshift(null);
 				TUMBLR.total++;
+				offset++;
 			}
 		
 			//console.log("posts:", offset, posts.length, TUMBLR.posts.length);
+			if(offset === TUMBLR.posts.length) {
+				TUMBLR.posts = TUMBLR.posts.concat(posts);
+			}
+			
 			//TODO: mix the posts, and if there's an overlap, then grab them from the front
 			//TUMBLR.posts.splice.apply(TUMBLR.posts, [offset, 0].concat(posts));
-			console.log("data", offset, end);
+			/*console.log("data", offset, end);
  			for(; i < end; i++) {
 				TUMBLR.posts[i] = i >= offset ? posts[j++] : null;
 			}
+			*/
 		}
 		
 		//console.log("posts:", posts.length, TUMBLR.posts.length);

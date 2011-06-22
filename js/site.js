@@ -449,35 +449,48 @@ var SKIN = {
 			render_func = opts.render,
 			fetch_func = opts.fetch,
 			element = SKIN.global("gallery."+template_id, cE("div", {empty: 1}, "Loading...")),
-			render_callback = function(template_id, render_func, page_offset, page_size, page_total) {
-				var pager = {
+			render_callback = function(template_id) {
+				var lib = {
+					fetch: fetch_func,
+					render: render_func,
+					page_offset: page_offset,
+					page_size: page_size,
+					page_total: page_total,
+					page: function(p) {
+						lib.page_offset = p < 0 ? 0 : p > lib.page_total ? lib.page_total : p;
+						lib.fetch(lib.page_offset, lib.page_size, lib.render);
+					},
 					pager_start: function() {
-						page_offset = 0;
-						fetch_func(page_offset, page_size, render_func);
+						lib.page_offset = 0;
+						lib.fetch(lib.page_offset, lib.page_size, lib.render);
 					},
 					pager_back: function() {
-						page_offset--;
-						if(page_offset < 0) page_offset = 0;
-						fetch_func(page_offset, page_size, render_func);
+						lib.page_offset--;
+						if(lib.page_offset < 0) lib.page_offset = 0;
+						lib.fetch(lib.page_offset, lib.page_size, lib.render);
 					},
 					pager_forward: function() {
-						page_offset++;
-						if(page_offset < 0) page_offset = 0;
-						fetch_func(page_offset, page_size, render_func);
+						lib.page_offset++;
+						if(lib.page_offset < 0) lib.page_offset = 0;
+						lib.fetch(lib.page_offset, lib.page_size, lib.render);
 					},
 					pager_end: function() {
-						page_offset = page_total - (page_total % page_size);
-						fetch_func(page_offset, page_size, render_func);
+						lib.page_offset = lib.page_total - (lib.page_total % lib.page_size);
+						lib.fetch(lib.page_offset, lib.page_size, lib.render);
 					}
 				};
+				
+				if(typeof opts.controller === 'function') {
+					opts.controller(lib);
+				}
 				
 				// render_callback
 				return function(page_offset, page_size, data) {
 					console.log("render_callback", "gallery."+template_id);
-					SKIN.set_global("gallery."+template_id, SKIN.template(template_id, data, null, pager), true);
+					SKIN.set_global("gallery."+template_id, SKIN.template(template_id, data, null, lib), true);
 					render_func(page_offset, page_size, data);
 				};
-			}(template_id, render_func, page_offset, page_size, page_total);
+			}(template_id);
 		
 		setTimeout(function() {
 			fetch_func(page_offset, page_size, render_callback);
