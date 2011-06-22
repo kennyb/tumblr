@@ -1,0 +1,132 @@
+
+<xmp id="home">
+	<h1>tumblr gallery</h1>
+	<p>
+		this is an example of using a template system to make a frontend for the popular blogging page, <a href="http://tumblr.com/" target="_blank">tumblr</a>.
+	</p>
+	<p>
+		some of the javascript is kinda funky, so I'd appreciate your input, instead of criticism, know what I mean?
+	</p>
+	<p>
+		-kenny (<a href="mailto:kenny@unhosted.org">kenny@unhosted.org</a>)
+	</p>
+	<p><?=telescopic("[hi|hello, how are you.] [my name is|they call me here on earth] [kenny|[k-dawg|kenneth edward bentley, by birth]], and I am a [programmer|hacker; convinced I will blow people's minds with my [programs!|..well ok, they're more like masterpieces, you're right]]")?></p>
+</xmp>
+
+<xmp id="sidebar">
+	<h1>random tumblogs</h1>
+	<div>
+		<?=SKIN.global('tumblr.user', cE('input', {value: TUMBLR.user,
+		onclick: function(e) {
+			this.select();
+		},
+		onkeyup: function(e) {
+			var k = e.keyCode;
+			if(k === 13) {
+				document.location.hash = '/tumblr/'+TUMBLR.type+'/'+this.value;
+			}
+		}}))?>
+	</div>
+	<div><a href="#/tumblr/photo/hamsternipples">hamsternipples</a></div>
+	<div><a href="#/tumblr/photo/thenastygal">thenastygal</a></div>
+	<div><a href="#/tumblr/photo/threewordphrase">threewordphrase</a></div>
+	<div><a href="#/tumblr/photo/thelackoforiginality">thelackoforiginality</a></div>
+	<div><a href="#/tumblr/photo/cheaper-than-therapy">cheaper-than-therapy</a></div>
+	<div><a href="#/tumblr/photo/gingerphobia">gingerphobia</a></div>
+	<div><a href="#/tumblr/photo/myreto">myreto</a></div>
+</xmp>
+
+
+<xmp id="tumblr">
+	<?
+	var params = d.args || [],
+		type = params[0] || 'photo',
+		user = params[1] || TUMBLR.user,
+		reset = false;
+	
+	if(type && type !== TUMBLR.type) {
+		TUMBLR.type = params[0];
+		reset = true;
+	}
+	
+	if(user && user !== TUMBLR.user) {
+		TUMBLR.user = params[1];
+		reset = true;
+	}
+	
+	console.log("pasando por aqui");
+	if(reset) {
+		TUMBLR.posts = [];
+		TUMBLR.total = -1;
+		/*
+		SKIN.renderPanel('tumblr');
+		SKIN.setWindowTitle("tumblr test");
+		*/
+	}
+	?>
+	<div>
+		<?=SKIN.gallery({
+			template: 'tumblr_gallery',
+			page: 'tumblr_entry',
+			pager: 'pager',
+			page_offset: 0,
+			page_size: 1,
+			fetch: TUMBLR.fetch,
+			render: TUMBLR.render
+		})?>
+	</div>
+</xmp>
+
+<xmp id="tumblr_gallery">
+	<div>
+		<?=SKIN.global('tumblr.title', cE('h1', {c:'title'}))?>
+		<?=SKIN.global('tumblr.about', cE('div', {c:'about', style:'font-size: 200%; padding: 20px'}))?>
+	</div>
+	<div>
+		<button onclick="<?=d.pager_start()?>"><?="|<<"?></button>
+		<button onclick="<?=d.pager_back()?>"><?="<<"?></button>
+		<?=SKIN.global('tumblr.cur')?> of <?=SKIN.global('tumblr.total')?>
+		<button onclick="<?=console.log(d) && d.pager_forward()?>"><?=">>"?></button>
+		<button onclick="<?=d.pager_end()?>"><?=">>|"?></button>
+	</div>
+	<div>
+		<?=SKIN.global('tumblr.posts')?>
+	</div>
+</xmp>
+
+<xmp id="tumblr_entry">
+	<div>
+		<?
+		if(d.type === "photo") {
+			?><img src="<?=d['photo-url-1280']?>" alt="<?=d['photo-caption']?>" /><?
+		} else if(d.type === "regular") {
+			?>
+			<h1><?=d['regular-title']?></h1>
+			<div html="<?=d['regular-body']?>"></div>
+			<?
+		} else if(d.type === "quote") {
+			?>
+			<h1 html="<?=d['quote-text']?>"></h1>
+			<div>
+				<?
+				if(d['quote-source']) {
+					?><?=d['quote-source']?><?
+				} else {
+					?><em>-unknown</em><?
+				}
+				?>
+			</div>
+			<?
+		} else if(d.type === "link") {
+			?>
+			<a href="<?=d['link-url']?>"><?=d['link-text']?></a>
+			<?
+			if(d['link-decription']) {
+				?><div html="<?=d['link-decription']?>"></div><?
+			}
+		} else {
+			console.log(d);
+		}
+		?>
+	</div>
+</xmp>
