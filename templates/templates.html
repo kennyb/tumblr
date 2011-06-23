@@ -47,7 +47,7 @@
 			page: 'tumblr_entry',
 			pager: 'pager',
 			page_offset: 0,
-			page_size: 1,
+			page_size: 3,
 			controller: TUMBLR.gallery_control,
 			fetch: TUMBLR.fetch,
 			render: TUMBLR.render
@@ -69,6 +69,9 @@
 	</div>
 	<div>
 		<?=SKIN.global('tumblr.posts')?>
+		<?
+		console.trace();
+		?>
 	</div>
 </xmp>
 

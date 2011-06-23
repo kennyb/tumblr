@@ -69,7 +69,7 @@ TUMBLR = {
 	total: -1,
 	render_callback: null,
 	callback_offset: -1,
-	block_size: 2,
+	block_size: 3,
 	gallery: null,
 	gallery_control : function(gallery) {
 		console.log("TUMBLR.gallery_control", gallery);
