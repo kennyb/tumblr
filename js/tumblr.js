@@ -58,9 +58,12 @@ function telescopic(txt, expander) {
 	}
 }
 
+//TODO: fix the 'last' button/arrow (show the last page)
+//TODO: fix paging when switching the blog
 //TODO: set a loading dialog if the posts is empty and not the end of the array
 //TODO: disable / enable the appropriate buttons
 //TODO: add dates to the post
+// add this: http://threewordphrase.com/youare.htm
 
 TUMBLR = {
 	user: 'thelackoforiginality', //cheaper-than-therapy, gingerphobia, thelackoforiginality, myreto
@@ -120,13 +123,15 @@ TUMBLR = {
 			block_size = TUMBLR.block_size,
 			block_offset = page_offset,
 			posts = TUMBLR.posts.slice(page_offset, page_offset + page_size),
-			i;
+			i = 0;
 		
 		console.log("TUMBLR.fetch", page_offset, page_size, posts.length, data_callback);
 		
 		// remove null values
 		for(; i < posts.length; i++) {
+			console.log(posts[i]);
 			if(!posts[i]) {
+				console.log("splice");
 				posts.splice(i, 1);
 			}
 		}
@@ -176,7 +181,7 @@ TUMBLR = {
 			s;
 		
 		console.log("TUMBLR.get", TUMBLR.callback_offset, offset, TUMBLR.total)
-		if(TUMBLR.callback_offset === -1 && (total < 0 || offset + block_size < total)) {
+		if(TUMBLR.callback_offset === -1 && (total < 0 || offset < total)) {
 			TUMBLR.callback_offset = offset;
 			if(data_callback) {
 				TUMBLR.data_callback = data_callback;
@@ -205,9 +210,9 @@ TUMBLR = {
 	fetchback : function(d) {
 		var posts = d.posts,
 			offset = TUMBLR.callback_offset,
-			end = posts.length + offset,
+			end = posts.length + d["posts-start"],
 			e = $_('s_' + d["posts-type"] + d["posts-start"]),
-			i = offset, j = 0;
+			i = TUMBLR.posts.length, j = 0;
 		
 		console.log("TUMBLR.fetchback " + 's_'+d["posts-type"]+d["posts-start"]);
 		if(e) {
@@ -218,6 +223,7 @@ TUMBLR = {
 		//TODO: check to see if this number has changed
 		if(TUMBLR.total === -1) {
 			TUMBLR.posts = posts;
+			TUMBLR.gallery.total(d["posts-total"]*1);
 			TUMBLR.total = d["posts-total"]*1;
 		} else {
 			console.log("totals", TUMBLR.total, d["posts-total"])
@@ -225,11 +231,16 @@ TUMBLR = {
 				TUMBLR.posts.unshift(null);
 				TUMBLR.total++;
 				offset++;
+				i++;
 			}
 		
 			//console.log("posts:", offset, posts.length, TUMBLR.posts.length);
 			if(offset === TUMBLR.posts.length) {
 				TUMBLR.posts = TUMBLR.posts.concat(posts);
+			} else {
+				for(; i < end; i++) {
+					TUMBLR.posts[i] = i >= offset ? posts[j++] : null;
+				}
 			}
 			
 			//TODO: mix the posts, and if there's an overlap, then grab them from the front

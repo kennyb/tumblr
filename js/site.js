@@ -456,7 +456,14 @@ var SKIN = {
 					page_offset: page_offset,
 					page_size: page_size,
 					page_total: page_total,
-					page: function(p) {
+					total: function(v) {
+						if(typeof v !== 'undefined') {
+							lib.page_total = v;
+						}
+						
+						return lib.page_total;
+					},
+					pager_goto: function(p) {
 						lib.page_offset = p < 0 ? 0 : p > lib.page_total ? lib.page_total : p;
 						lib.fetch(lib.page_offset, lib.page_size, lib.render);
 					},
@@ -476,6 +483,10 @@ var SKIN = {
 					},
 					pager_end: function() {
 						lib.page_offset = lib.page_total - (lib.page_total % lib.page_size);
+						if(lib.page_offset === lib.page_total) {
+							lib.page_offset -= lib.page_size;
+						}
+						console.log("PAGER END", lib.page_total, lib.page_offset);
 						lib.fetch(lib.page_offset, lib.page_size, lib.render);
 					}
 				};
