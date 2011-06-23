@@ -465,12 +465,12 @@ var SKIN = {
 						lib.fetch(lib.page_offset, lib.page_size, lib.render);
 					},
 					pager_back: function() {
-						lib.page_offset--;
+						lib.page_offset -= lib.page_size;
 						if(lib.page_offset < 0) lib.page_offset = 0;
 						lib.fetch(lib.page_offset, lib.page_size, lib.render);
 					},
 					pager_forward: function() {
-						lib.page_offset++;
+						lib.page_offset += lib.page_size;
 						if(lib.page_offset < 0) lib.page_offset = 0;
 						lib.fetch(lib.page_offset, lib.page_size, lib.render);
 					},
@@ -486,7 +486,7 @@ var SKIN = {
 				
 				// render_callback
 				return function(page_offset, page_size, data) {
-					console.log("render_callback", "gallery."+template_id);
+					console.log("render_callback", "gallery."+template_id, data);
 					SKIN.set_global("gallery."+template_id, SKIN.template(template_id, data, null, lib), true);
 					render_func(page_offset, page_size, data);
 				};

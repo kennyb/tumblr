@@ -67,9 +67,9 @@ TUMBLR = {
 	type: 'photo',
 	posts: [],
 	total: -1,
-	render_callback: null,
+	data_callback: null,
 	callback_offset: -1,
-	block_size: 3,
+	block_size: 6,
 	gallery: null,
 	gallery_control : function(gallery) {
 		console.log("TUMBLR.gallery_control", gallery);
@@ -105,37 +105,6 @@ TUMBLR = {
 		} else {
 			SKIN.template("tumblr", {args: params}, $_('content'));
 		}
-		
-		/*
-		// --------
-		// inside template
-		// --------
-		
-		var params = d.args || [],
-			type = params[0] || 'photo',
-			user = params[1] || TUMBLR.user,
-			reset = false;
-
-		if(type && type !== TUMBLR.type) {
-			TUMBLR.type = params[0];
-			reset = true;
-		}
-
-		if(user && user !== TUMBLR.user) {
-			TUMBLR.user = params[1];
-			reset = true;
-		}
-
-		console.log("pasando por aqui");
-		if(reset) {
-			TUMBLR.posts = [];
-			TUMBLR.total = -1;
-			//SKIN.renderPanel('tumblr');
-			//SKIN.setWindowTitle("tumblr test");
-		}
-		
-		
-		*/
 	},
 	render : function(page_offset, page_size, posts) {
 		console.log("TUMBLR.render", page_offset, page_size, posts);
@@ -147,62 +116,104 @@ TUMBLR = {
 		}
 	},
 	fetch : function(page_offset, page_size, data_callback, force) {
-		var posts = TUMBLR.posts.slice(page_offset, page_offset + page_size);
+		var total = TUMBLR.total,
+			block_size = TUMBLR.block_size,
+			block_offset = page_offset,
+			posts = TUMBLR.posts.slice(page_offset, page_offset + page_size),
+			i;
+		
 		console.log("TUMBLR.fetch", page_offset, page_size, posts.length, data_callback);
 		
-		if(posts.length === page_size) {
-			//TODO: check to see if it's null or not, and if it isn't null, then show it, otherwise get a block
-			data_callback(page_offset, page_size, posts);
-		} else if(!force) {
-			// preload
-			if(page_offset+page_size+2 > TUMBLR.posts.length) {
-				console.log("GET1", page_offset, page_size);
-				TUMBLR.get(page_offset, page_size, function(data) {
-					console.log("TUMBLR.get", data);
-					TUMBLR.fetch(page_offset, page_size, data_callback, true);
-				});
+		// remove null values
+		for(; i < posts.length; i++) {
+			if(!posts[i]) {
+				posts.splice(i, 1);
 			}
 		}
+		
+		if(posts.length === page_size) {
+			data_callback(page_offset, page_size, posts);
+		}
+		
+		if(!force) {
+			// preload next block
+			if(TUMBLR.total === -1) {
+				page_offset = 0;
+				total = 1;
+			} else {
+				block_offset = page_offset - (page_offset % block_size);
+				posts = TUMBLR.posts.slice(page_offset, page_offset + block_size);
+				for(; i < posts.length; i++) {
+					if(!posts[i]) {
+						posts.splice(i, 1);
+					}
+				}
+			}
+			
+			if(posts.length === block_size && (page_offset % block_size) / block_size > 0.5) {
+				block_offset += block_size;
+			}
+			
+			console.log(posts.length, page_offset, block_offset, block_size, total);
+			if(posts.length !== block_size && page_offset < total) {
+				TUMBLR.get(block_offset, block_size, function(page_offset, block_offset) {
+					return function(data) {
+						console.log("TUMBLR.get(callback)", page_offset, block_offset);
+						if(page_offset === block_offset) {
+							TUMBLR.fetch(page_offset, page_size, data_callback, true);
+						}
+					};
+				}(page_offset, block_offset));
+			}
+		} else {
+			//TODO: we attempted to fetch the data but it was not available for some reason. show an error
+		}
 	},
-	get : function(page_offset, page_size, render_callback) {
+	get : function(page_offset, page_size, data_callback) {
 		var block_size = TUMBLR.block_size,
 			total = TUMBLR.total,
-			offset = page_offset - (page_offset % block_size);//TUMBLR.posts.length;
+			offset = page_offset - (page_offset % block_size),
+			s;
 		
 		console.log("TUMBLR.get", TUMBLR.callback_offset, offset, TUMBLR.total)
 		if(TUMBLR.callback_offset === -1 && (total < 0 || offset + block_size < total)) {
 			TUMBLR.callback_offset = offset;
-			if(render_callback) {
-				TUMBLR.render_callback = render_callback;
+			if(data_callback) {
+				TUMBLR.data_callback = data_callback;
 			}
 		
-			console.log("GET2", offset);
-			//console.trace();
-			//var s = LOADER.renderScript('http://'+TUMBLR.user+'.tumblr.com/api/read/json?callback=TUMBLR.data&num='+block_size+'&type='+TUMBLR.type+'&start='+TUMBLR.callback_offset);
-			if(false && DEBUG) {
-				console.log("LLLLLL");
-				TUMBLR.fetchback({"tumblelog":{"title":"Three Word Phrase","description":"<a href=\"http:\/\/threewordphrase.tumblr.com\"><img src=\"http:\/\/threewordphrase.com\/header.gif\"><\/a>","name":"threewordphrase","timezone":"US\/Eastern","cname":false,"feeds":[]},"posts-start":0,"posts-total":49,"posts-type":"photo","posts":[{"id":"6611528437","url":"http:\/\/threewordphrase.tumblr.com\/post\/6611528437","url-with-slug":"http:\/\/threewordphrase.tumblr.com\/post\/6611528437","type":"photo","date-gmt":"2011-06-17 04:13:27 GMT","date":"Fri, 17 Jun 2011 00:13:27","bookmarklet":0,"mobile":0,"feed-item":"","from-feed-id":0,"unix-timestamp":1308284007,"format":"html","reblog-key":"z4yiDCqJ","slug":"","photo-caption":"","photo-link-url":"http:\/\/www.threewordphrase.com\/debate.htm","width":"800","height":"792","photo-url-1280":"http:\/\/threewordphrase.tumblr.com\/photo\/1280\/6611528437\/1\/tumblr_lmx2eeJ3tf1qhhhac","photo-url-500":"http:\/\/24.media.tumblr.com\/tumblr_lmx2eeJ3tf1qhhhaco1_500.gif","photo-url-400":"http:\/\/27.media.tumblr.com\/tumblr_lmx2eeJ3tf1qhhhaco1_400.gif","photo-url-250":"http:\/\/25.media.tumblr.com\/tumblr_lmx2eeJ3tf1qhhhaco1_250.gif","photo-url-100":"http:\/\/26.media.tumblr.com\/tumblr_lmx2eeJ3tf1qhhhaco1_100.gif","photo-url-75":"http:\/\/29.media.tumblr.com\/tumblr_lmx2eeJ3tf1qhhhaco1_75sq.gif","photos":[],"tags":["three word phrase","debate","president bird","issues","kisses"]},{"id":"6595165685","url":"http:\/\/threewordphrase.tumblr.com\/post\/6595165685","url-with-slug":"http:\/\/threewordphrase.tumblr.com\/post\/6595165685\/after-the-riots-in-vancouver-this-feels-sort-of","type":"photo","date-gmt":"2011-06-16 19:25:10 GMT","date":"Thu, 16 Jun 2011 15:25:10","bookmarklet":0,"mobile":0,"feed-item":"","from-feed-id":0,"unix-timestamp":1308252310,"format":"html","reblog-key":"JHRpTGT9","slug":"after-the-riots-in-vancouver-this-feels-sort-of","photo-caption":"<p>after the riots in vancouver this feels sort of appropriate today<\/p>","photo-link-url":"http:\/\/threewordphrase.com\/allupin.htm","width":"650","height":"243","photo-url-1280":"http:\/\/threewordphrase.tumblr.com\/photo\/1280\/6595165685\/1\/tumblr_lmwdxy95s11qhhhac","photo-url-500":"http:\/\/27.media.tumblr.com\/tumblr_lmwdxy95s11qhhhaco1_500.gif","photo-url-400":"http:\/\/30.media.tumblr.com\/tumblr_lmwdxy95s11qhhhaco1_400.gif","photo-url-250":"http:\/\/26.media.tumblr.com\/tumblr_lmwdxy95s11qhhhaco1_250.gif","photo-url-100":"http:\/\/26.media.tumblr.com\/tumblr_lmwdxy95s11qhhhaco1_100.gif","photo-url-75":"http:\/\/25.media.tumblr.com\/tumblr_lmwdxy95s11qhhhaco1_75sq.gif","photos":[],"tags":["canada","noooo"]}]});
-			} else {
-				var s = cE('script'),
-					d = document.getElementsByTagName('script')[0];
-				s.type = 'text/javascript';
-				s.async = true;
-				s.src = 'http://'+TUMBLR.user+'.tumblr.com/api/read/json?callback=TUMBLR.fetchback&num='+block_size+'&type='+TUMBLR.type+'&start='+TUMBLR.callback_offset;
-				d.parentNode.insertBefore(s, d);
-				//TODO: onerror, show a message saying there was an error and a retry will be made in x seconds...
-				/*LIB.addEvent('error', function() {
-				
-				}, s);*/
-			}
+			//TODO: set the scripts with an id and don't rerequest if it's already requested
+			//TODO: handle onerror events
+			//TODO: delete the script tag after it's done loading
+			//TODO: perhaps look into trying a requesting iframe, to not polute the namespace so much
+			var d = document.getElementsByTagName('script')[0],
+			s = cE('script', {
+				type: 'text/javascript',
+				async: true,
+				id: 's_'+TUMBLR.type + page_offset,
+				src: 'http://'+TUMBLR.user+'.tumblr.com/api/read/json?callback=TUMBLR.fetchback&num='+block_size+'&type='+TUMBLR.type+'&start='+TUMBLR.callback_offset,
+			});
+			
+			d.parentNode.insertBefore(s, d);
+			
+			//TODO: onerror, show a message saying there was an error and a retry will be made in x seconds...
+			/*LIB.addEvent('error', function() {
+			
+			}, s);*/
 		}
 	},
 	fetchback : function(d) {
 		var posts = d.posts,
 			offset = TUMBLR.callback_offset,
 			end = posts.length + offset,
+			e = $_('s_' + d["posts-type"] + d["posts-start"]),
 			i = offset, j = 0;
 		
-		console.log("TUMBLR.fetchback");
+		console.log("TUMBLR.fetchback " + 's_'+d["posts-type"]+d["posts-start"]);
+		if(e) {
+			e.parentNode.removeChild(e);
+		}
+		
 		TUMBLR.callback_offset = -1;
 		//TODO: check to see if this number has changed
 		if(TUMBLR.total === -1) {
@@ -231,8 +242,8 @@ TUMBLR = {
 		}
 		
 		//console.log("posts:", posts.length, TUMBLR.posts.length);
-		if(TUMBLR.render_callback) {
-			TUMBLR.render_callback(d);
+		if(TUMBLR.data_callback) {
+			TUMBLR.data_callback(d);
 		}
 		
 		SKIN.set_global('tumblr.title', d.tumblelog.title);
