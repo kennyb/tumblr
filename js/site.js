@@ -498,7 +498,7 @@ var SKIN = {
 				// render_callback
 				return function(page_offset, page_size, data) {
 					console.log("render_callback", "gallery."+template_id, data);
-					SKIN.set_global("gallery."+template_id, SKIN.template(template_id, data, null, lib), true);
+					SKIN.set_global("gallery."+template_id, SKIN.template(template_id, lib), true);
 					render_func(page_offset, page_size, data);
 				};
 			}(template_id);
