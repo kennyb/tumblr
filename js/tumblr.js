@@ -99,13 +99,12 @@ TUMBLR = {
 		if(reset) {
 			TUMBLR.posts = [];
 			TUMBLR.total = -1;
-			//SKIN.renderPanel('tumblr');
-			//SKIN.setWindowTitle("tumblr test");
-			//MENU.selectItem($('sm'+type));
-			//SKIN.resize();
+			TUMBLR.callback_offset = -1;
 		}
 		
+		console.log("TUMBLR.load", type, user, reset);
 		if(SKIN.global_exists("gallery.tumblr_gallery")) {
+			TUMBLR.gallery.page_offset = 0;
 			TUMBLR.fetch(reset ? 0 : TUMBLR.gallery.page_offset, TUMBLR.gallery.page_size, TUMBLR.gallery.render);
 		} else {
 			SKIN.template("tumblr", {args: params}, $_('content'));
@@ -155,9 +154,7 @@ TUMBLR = {
 				i = posts.length-1;
 				if(i >= 0) {
 					do {
-						console.log(i, posts[i]);
 						if(!posts[i]) {
-							console.log("splice");
 							posts.splice(i, 1);
 						}
 					} while(i--);
@@ -168,11 +165,11 @@ TUMBLR = {
 				block_offset += block_size;
 			}
 			
-			console.log(posts.length, page_offset, block_offset, block_size, total);
+			//console.log("TUMBLR.fetch", posts.length, page_offset, block_offset, block_size, total);
 			if(posts.length !== block_size && page_offset < total) {
 				TUMBLR.get(block_offset, block_size, function(page_offset, block_offset) {
 					return function(data) {
-						console.log("TUMBLR.get(callback)", page_offset, block_offset);
+						console.log("TUMBLR.get(callback)", TUMBLR.gallery.page_offset, page_offset, "|", block_offset);
 						if(TUMBLR.gallery.page_offset === page_offset) {
 							TUMBLR.fetch(page_offset, page_size, data_callback, true);
 						}
