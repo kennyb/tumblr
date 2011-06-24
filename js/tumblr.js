@@ -4,6 +4,8 @@
 // expanding events can be done by replacing the expander function with some extra logic to look up in an array what function to call
 // same can be done with colors - colors can be looked up too (based on text value)
 
+// "nigga'lippin that bitch" defined as, "swiped that shit and then slobbered all over her" #racist
+
 function telescopic(txt, expander) {
 	var first = txt.indexOf('['),
 		last = txt.indexOf(']'),
@@ -123,21 +125,23 @@ TUMBLR = {
 			block_size = TUMBLR.block_size,
 			block_offset = page_offset,
 			posts = TUMBLR.posts.slice(page_offset, page_offset + page_size),
-			i = 0;
+			i = posts.length-1;
 		
 		console.log("TUMBLR.fetch", page_offset, page_size, posts.length, data_callback);
 		
 		// remove null values
-		for(; i < posts.length; i++) {
-			console.log(posts[i]);
-			if(!posts[i]) {
-				console.log("splice");
-				posts.splice(i, 1);
-			}
+		if(i >= 0) {
+			do {
+				if(!posts[i]) {
+					posts.splice(i, 1);
+				}
+			} while(i--);
 		}
 		
 		if(posts.length === page_size) {
 			data_callback(page_offset, page_size, posts);
+		} else {
+			//TODO: I think there's something that goes here
 		}
 		
 		if(!force) {
@@ -148,10 +152,15 @@ TUMBLR = {
 			} else {
 				block_offset = page_offset - (page_offset % block_size);
 				posts = TUMBLR.posts.slice(page_offset, page_offset + block_size);
-				for(; i < posts.length; i++) {
-					if(!posts[i]) {
-						posts.splice(i, 1);
-					}
+				i = posts.length-1;
+				if(i >= 0) {
+					do {
+						console.log(i, posts[i]);
+						if(!posts[i]) {
+							console.log("splice");
+							posts.splice(i, 1);
+						}
+					} while(i--);
 				}
 			}
 			
@@ -164,7 +173,7 @@ TUMBLR = {
 				TUMBLR.get(block_offset, block_size, function(page_offset, block_offset) {
 					return function(data) {
 						console.log("TUMBLR.get(callback)", page_offset, block_offset);
-						if(page_offset === block_offset) {
+						if(TUMBLR.gallery.page_offset === page_offset) {
 							TUMBLR.fetch(page_offset, page_size, data_callback, true);
 						}
 					};
@@ -189,7 +198,6 @@ TUMBLR = {
 		
 			//TODO: set the scripts with an id and don't rerequest if it's already requested
 			//TODO: handle onerror events
-			//TODO: delete the script tag after it's done loading
 			//TODO: perhaps look into trying a requesting iframe, to not polute the namespace so much
 			var d = document.getElementsByTagName('script')[0],
 			s = cE('script', {
@@ -212,9 +220,9 @@ TUMBLR = {
 			offset = TUMBLR.callback_offset,
 			end = posts.length + d["posts-start"],
 			e = $_('s_' + d["posts-type"] + d["posts-start"]),
-			i = TUMBLR.posts.length, j = 0;
+			i = offset, j = 0;
 		
-		console.log("TUMBLR.fetchback " + 's_'+d["posts-type"]+d["posts-start"]);
+		console.log("TUMBLR.fetchback " + 's_'+d["posts-type"]+d["posts-start"], TUMBLR.callback_offset);
 		if(e) {
 			e.parentNode.removeChild(e);
 		}
@@ -235,6 +243,7 @@ TUMBLR = {
 			}
 		
 			//console.log("posts:", offset, posts.length, TUMBLR.posts.length);
+			//TUMBLR.posts.splice.apply(TUMBLR.posts, [offset, 0].concat(posts));
 			if(offset === TUMBLR.posts.length) {
 				TUMBLR.posts = TUMBLR.posts.concat(posts);
 			} else {
@@ -242,17 +251,8 @@ TUMBLR = {
 					TUMBLR.posts[i] = i >= offset ? posts[j++] : null;
 				}
 			}
-			
-			//TODO: mix the posts, and if there's an overlap, then grab them from the front
-			//TUMBLR.posts.splice.apply(TUMBLR.posts, [offset, 0].concat(posts));
-			/*console.log("data", offset, end);
- 			for(; i < end; i++) {
-				TUMBLR.posts[i] = i >= offset ? posts[j++] : null;
-			}
-			*/
 		}
 		
-		//console.log("posts:", posts.length, TUMBLR.posts.length);
 		if(TUMBLR.data_callback) {
 			TUMBLR.data_callback(d);
 		}
