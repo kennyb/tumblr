@@ -79,6 +79,32 @@ var SKIN = {
 			console.error("global variable '"+k+"' does not exist");
 		}
 	},
+	link : function(link_key, v, opts) {
+		if(typeof opts !== 'object') {
+			opts = {};
+		}
+		
+		var params = STATEMANAGER.hash.substr(2).split('/'),
+			key = link_key.split('/'),
+			key_len = key.length,
+			link = new Array(key_len),
+			i, lk, ll, e;
+		
+		for(i = 0; i < key_len; i++) {
+			lk = key[i];
+			link[i] = lk === '*' ? params[i] : lk;
+		}
+		
+		opts.href = "#/"+link.join('/');
+		e = cE('a', opts, v);
+		
+		SKIN.global("link."+link_key, e);
+		
+		return e;
+	},
+	update_link : function(link_key, v) {
+		
+	},
 	get_template : function(tpl, txt) {
 		typeof txt === 'undefined' && (txt = SKIN.templates_txt[tpl]);
 		var fn = null;
