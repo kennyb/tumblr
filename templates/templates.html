@@ -86,13 +86,18 @@
 <xmp id="tumblr_entry">
 	<div>
 		<?
-		if(d.type === "photo") {
-			?><img src="<?=d['photo-url-1280']?>" alt="<?=d['photo-caption']?>" /><?
-		} else if(d.type === "regular") {
+		if(d.type === "regular") {
 			?>
 			<h1><?=d['regular-title']?></h1>
 			<div html="<?=d['regular-body']?>"></div>
 			<?
+		} else if(d.type === "link") {
+			?>
+			<a href="<?=d['link-url']?>"><?=d['link-text']?></a>
+			<?
+			if(d['link-decription']) {
+				?><div html="<?=d['link-decription']?>"></div><?
+			}
 		} else if(d.type === "quote") {
 			?>
 			<h1 html="<?=d['quote-text']?>"></h1>
@@ -106,13 +111,30 @@
 				?>
 			</div>
 			<?
-		} else if(d.type === "link") {
+		} else if(d.type === "photo") {
 			?>
-			<a href="<?=d['link-url']?>"><?=d['link-text']?></a>
+			<img src="<?=d['photo-url-1280']?>" alt="<?=d['photo-caption']?>" />
 			<?
-			if(d['link-decription']) {
-				?><div html="<?=d['link-decription']?>"></div><?
-			}
+		} else if(d.type === "conversation") {
+			?>
+			<h1><?=d['conversation-title']?></h1>
+			<div html="<?=d['conversation-text']?>"></div>
+			<?
+		} else if(d.type === "answer") {
+			?>
+			<h1><?=d['question']?></h1>
+			<h2><?=d['answer']?></h2>
+			<?
+		} else if(d.type === "audio") {
+			?>
+			<h1><?=d['audio-caption']?></h1>
+			<div html="<?=d['audio-player']?>"></div>
+			<?
+		} else if(d.type === "video") {
+			?>
+			<h1 html="<?=d['video-caption']?>"></h1>
+			<div html="<?=d['video-player']?>"></div>
+			<?
 		} else {
 			console.log(d);
 		}

@@ -60,12 +60,10 @@ function telescopic(txt, expander) {
 	}
 }
 
-//TODO: fix the 'last' button/arrow (show the last page)
-//TODO: fix paging when switching the blog
 //TODO: set a loading dialog if the posts is empty and not the end of the array
 //TODO: disable / enable the appropriate buttons
 //TODO: add dates to the post
-// add this: http://threewordphrase.com/youare.htm
+// add this: http://threewordphrase.com/youare.htm (it's hard though, because it's not tumblr or has an api)
 
 TUMBLR = {
 	user: 'thelackoforiginality', //cheaper-than-therapy, gingerphobia, thelackoforiginality, myreto
@@ -197,11 +195,12 @@ TUMBLR = {
 			//TODO: handle onerror events
 			//TODO: perhaps look into trying a requesting iframe, to not polute the namespace so much
 			var d = document.getElementsByTagName('script')[0],
+				type = TUMBLR.type,
 			s = cE('script', {
 				type: 'text/javascript',
 				async: true,
 				id: 's_'+TUMBLR.type + page_offset,
-				src: 'http://'+TUMBLR.user+'.tumblr.com/api/read/json?callback=TUMBLR.fetchback&num='+block_size+'&type='+TUMBLR.type+'&start='+TUMBLR.callback_offset,
+				src: 'http://'+TUMBLR.user+'.tumblr.com/api/read/json?callback=TUMBLR.fetchback&num='+block_size+(type !== 'all' ? '&type='+TUMBLR.type : '')+'&start='+TUMBLR.callback_offset,
 			});
 			
 			d.parentNode.insertBefore(s, d);
