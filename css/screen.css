@@ -68,8 +68,16 @@ td {
   font-family: inherit;
   vertical-align: baseline;
   /*overflow: hidden;*/
-}
 
+}
+.menu li {
+  display: inline;
+  padding-left: 10px;
+}
+.menu li:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
 .contract {
   display: none;
 }

@@ -61,6 +61,17 @@
 		<?=SKIN.global('tumblr.about', cE('div', {c:'about', style:'font-size: 200%; padding: 20px'}))?>
 	</div>
 	<div>
+		<ul class="menu">
+			<li><?=SKIN.link('*/all/*', 'all')?></li>
+			<li><?=SKIN.link('*/text/*', 'blog')?></li>
+			<li><?=SKIN.link('*/photo/*', 'photos')?></li>
+			<li><?=SKIN.link('*/link/*', 'links')?></li>
+			<li><?=SKIN.link('*/chat/*', 'chats')?></li>
+			<li><?=SKIN.link('*/audio/*', 'audio')?></li>
+			<li><?=SKIN.link('*/video/*', 'videos')?></li>
+		</ul>
+	</div>
+	<div>
 		<button onclick="<?=d.pager_start()?>"><?="|<<"?></button>
 		<button onclick="<?=d.pager_back()?>"><?="<<"?></button>
 		<?=SKIN.global('tumblr.cur')?> of <?=SKIN.global('tumblr.total')?>
