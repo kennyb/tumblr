@@ -126,15 +126,14 @@ TUMBLR = {
 		}
 	},
 	fetch : function(page_offset, page_size, data_callback, force) {
-		var total = TUMBLR.total,
-			type = TUMBLR.type,
+		var type = TUMBLR.type,
+			total = TUMBLR.total[type],
 			block_size = TUMBLR.block_size,
 			block_offset = page_offset,
 			posts = TUMBLR.posts[type] ? TUMBLR.posts[type].slice(page_offset, page_offset + page_size) : [],
 			i = posts.length-1;
 		
 		console.log("TUMBLR.fetch", type, page_offset, page_size, posts.length, data_callback);
-		
 		// remove null values
 		if(i >= 0) {
 			do {
@@ -223,7 +222,7 @@ TUMBLR = {
 	fetchback : function(d) {
 		var posts = d.posts,
 			type = d["posts-type"] || 'all',
-			total = TUMBLR.total[type],
+			ttotal = TUMBLR.total[type],
 			offset = d["posts-start"]*1,
 			total = d["posts-total"]*1,
 			callback = TUMBLR.data_callback,
@@ -237,12 +236,12 @@ TUMBLR = {
 		}
 		
 		//TODO: check to see if this number has changed
-		if(TUMBLR.total[type] === -1) {
+		if(ttotal === -1 || typeof ttotal === 'undefined') {
 			TUMBLR.posts[type] = posts;
-			TUMBLR.gallery.total(d["posts-total"]*1);
+			TUMBLR.gallery.total(total);
 			TUMBLR.total[type] = total;
 		} else {
-			console.log("totals", TUMBLR.total, d["posts-total"]);
+			console.log("totals", TUMBLR.total[type], d["posts-total"]);
 			while(total < d["posts-total"]) {
 				TUMBLR.posts[type].unshift(null);
 				//TUMBLR.total++;
