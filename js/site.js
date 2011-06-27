@@ -61,7 +61,7 @@ var SKIN = {
 			console.log("set global "+k, v);
 			do {
 				e = els[i];
-				if(force || LIB.inDom(e) || true) {
+				if(force || LIB.inDom(e)) {
 					if(typeof v === 'undefined') {
 						LIB.hide(e);
 					} else {

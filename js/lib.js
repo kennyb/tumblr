@@ -17,15 +17,16 @@ function display(elem, show) {
 }
 
 function aC(e, value) {
-	if(typeof value === 'undefined') return;
-	if(value.constructor == Array) {
-		for(var i = 0, len = value.length; i < len; i++) {
-			aC(e, value[i]);
+	if(typeof value !== 'undefined' && value !== null) {
+		if(value.constructor == Array) {
+			for(var i = 0, len = value.length; i < len; i++) {
+				aC(e, value[i]);
+			}
+		} else if(typeof value !== "object") {
+			e.appendChild(document.createTextNode(value));
+		} else {
+			e.appendChild(typeof value._element === "object" ? value._element : value);
 		}
-	} else if(typeof value !== "object") {
-		e.appendChild(document.createTextNode(value));
-	} else {
-		e.appendChild(typeof value._element === "object" ? value._element : value);
 	}
 }
 
@@ -285,6 +286,7 @@ SERVER = {
 },
 
 STATEMANAGER = {
+	panel: null,
 	start : function() {
 		clearInterval(STATEMANAGER.timer);
 		STATEMANAGER.timer = setInterval(function() { STATEMANAGER.check() }, 50);
@@ -314,7 +316,7 @@ STATEMANAGER = {
 			var intercept = STATEMANAGER.intercept[panel];
 			if(intercept) {
 				intercept(panel, params);
-			} else {
+			} else if(panel !== STATEMANAGER.panel) {
 				SKIN.template(panel, {args: params}, $_('content'));
 			}
 		} else {

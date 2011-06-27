@@ -85,8 +85,16 @@ TUMBLR = {
 			user = params[1] || TUMBLR.user,
 			reset = false;
 		
+		if(type === 'chat') {
+			type = 'conversation';
+		} else if(type === 'text') {
+			type = 'regular';
+		} else if(!type) {
+			type = 'all';
+		}
+		
 		if(type && type !== TUMBLR.type) {
-			TUMBLR.type = params[0];
+			TUMBLR.type = type;
 			reset = true;
 		}
 		
@@ -125,7 +133,7 @@ TUMBLR = {
 			posts = TUMBLR.posts[type] ? TUMBLR.posts[type].slice(page_offset, page_offset + page_size) : [],
 			i = posts.length-1;
 		
-		console.log("TUMBLR.fetch", page_offset, page_size, posts.length, data_callback);
+		console.log("TUMBLR.fetch", type, page_offset, page_size, posts.length, data_callback);
 		
 		// remove null values
 		if(i >= 0) {
