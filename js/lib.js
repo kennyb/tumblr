@@ -322,11 +322,11 @@ STATEMANAGER = {
 			}
 		} else {
 			document.location.hash = '#/home';
-			STATEMANAGER.hash = null;
+			STATEMANAGER.hash = '';
 		}
 	},
 	intercept: {},
-	hash: null,
+	hash: '',
 	timer: 0
 },
 
