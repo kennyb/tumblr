@@ -89,11 +89,17 @@ var SKIN = {
 			key = link_key.split('/'),
 			key_len = key.length,
 			link = new Array(key_len),
-			i, lk, ll, e;
+			i, lk, ll = '', e, p;
 		
 		for(i = 0; i < key_len; i++) {
 			lk = key[i];
-			link[i] = lk === '*' ? params[i] : lk;
+			if(lk.charAt(0) === '*' && lk.charAt(1) === '|') {
+				ll = lk.substr(2);
+				lk = '*';
+			}
+			
+			p = params[i];
+			link[i] = lk === '*' ? (!!p ? p : ll) : lk;
 		}
 		
 		opts.href = "#/"+link.join('/');
@@ -111,11 +117,17 @@ var SKIN = {
 			var key = link_key.split('/'),
 				link = new Array(key_len),
 				els = SKIN.global_exists("link."+link_key),
-				i, lk, href;
+				i, lk, ll, href;
 			
 			for(i = 0; i < key_len; i++) {
 				lk = key[i];
-				link[i] = lk === '*' ? params[i] : lk;
+				if(lk.charAt(0) === '*' && lk.charAt(1) === '|') {
+					ll = lk.substr(2);
+					lk = '*';
+				}
+				
+				p = params[i];
+				link[i] = lk === '*' ? (!!p ? p : ll) : lk;
 			}
 			
 			href = "#/"+link.join('/');

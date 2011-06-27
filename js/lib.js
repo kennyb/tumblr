@@ -326,7 +326,7 @@ STATEMANAGER = {
 		}
 	},
 	intercept: {},
-	hash: '',
+	hash: 'null',
 	timer: 0
 },
 
