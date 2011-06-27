@@ -308,6 +308,7 @@ STATEMANAGER = {
 			}
 			STATEMANAGER.hash = h;
 			STATEMANAGER.loadPanel(panel, params);
+			SKIN.update_links();
 		}
 	},
 	loadPanel : function(panel, params) {
@@ -702,6 +703,13 @@ Array.prototype.none = function(callback) {
 	return this;
 }
 */
+
+Object.prototype.forEach = function(callback) {
+	var a = this, k;
+	for(k in a) if(a.hasOwnProperty(k)) {
+		callback(a[k], k, a);
+	}
+}
 
 Array.prototype.first = function(callback) {
 	if(this.length) {

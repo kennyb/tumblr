@@ -50,7 +50,7 @@
 			page: 'tumblr_entry',
 			pager: 'pager',
 			page_offset: 0,
-			page_size: 4,
+			page_size: 20,
 			controller: TUMBLR.gallery_control,
 			fetch: TUMBLR.fetch,
 			render: TUMBLR.render
@@ -125,7 +125,7 @@
 		} else if(d.type === "answer") {
 			?>
 			<h1><?=d['question']?></h1>
-			<h2><?=d['answer']?></h2>
+			<h2 html="<?=d['answer']?>"></h2>
 			<?
 		} else if(d.type === "audio") {
 			?>

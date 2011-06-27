@@ -3,6 +3,7 @@
 
 var SKIN = {
 	globals: {},
+	links: {},
 	templates: {},
 	templates_txt: {},
 	gc : function() {
@@ -99,11 +100,31 @@ var SKIN = {
 		e = cE('a', opts, v);
 		
 		SKIN.global("link."+link_key, e);
+		SKIN.links[link_key] = key_len;
 		
 		return e;
 	},
-	update_link : function(link_key, v) {
+	update_links : function() {
+		var params = STATEMANAGER.hash.substr(2).split('/');
 		
+		SKIN.links.forEach(function(key_len, link_key) {
+			var key = link_key.split('/'),
+				link = new Array(key_len),
+				els = SKIN.global_exists("link."+link_key),
+				i, lk, href;
+			
+			for(i = 0; i < key_len; i++) {
+				lk = key[i];
+				link[i] = lk === '*' ? params[i] : lk;
+			}
+			
+			href = "#/"+link.join('/');
+			for(i = 0; i < els.length; i++) {
+				els[i].href = href;
+			}
+			
+			//SKIN.set_global("link."+link_key, link.join('/'));
+		});
 	},
 	get_template : function(tpl, txt) {
 		typeof txt === 'undefined' && (txt = SKIN.templates_txt[tpl]);
