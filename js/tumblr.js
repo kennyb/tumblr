@@ -167,7 +167,7 @@ TUMBLR = {
 				}
 			}
 			
-			if(posts.length === block_size && (page_offset % block_size) / block_size > 0.5) {
+			if(posts.length === page_size && (page_offset % block_size) / block_size > 0.5) {
 				block_offset += block_size;
 			}
 			
@@ -186,11 +186,10 @@ TUMBLR = {
 			//TODO: we attempted to fetch the data but it was not available for some reason. show an error
 		}
 	},
-	get : function(page_offset, page_size, data_callback) {
+	get : function(offset, page_size, data_callback) {
 		var block_size = TUMBLR.block_size,
 			type = TUMBLR.type,
 			total = TUMBLR.total[type] || -1,
-			offset = page_offset - (page_offset % block_size),
 			s;
 		
 		console.log("TUMBLR.get", offset, total, TUMBLR.data_callback);
@@ -207,7 +206,7 @@ TUMBLR = {
 			s = cE('script', {
 				type: 'text/javascript',
 				async: true,
-				id: 's_'+TUMBLR.type + page_offset,
+				id: 's_'+TUMBLR.type + offset,
 				src: 'http://'+TUMBLR.user+'.tumblr.com/api/read/json?callback=TUMBLR.fetchback&num='+block_size+(type !== 'all' ? '&type='+type : '')+'&start='+offset,
 			});
 			
