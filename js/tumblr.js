@@ -105,7 +105,6 @@ TUMBLR = {
 		
 		if(reset || !TUMBLR.posts[type]) {
 			TUMBLR.posts[type] = [];
-			//TUMBLR.total[type] = -1;
 		}
 		
 		console.log("TUMBLR.load", type, user, reset);
