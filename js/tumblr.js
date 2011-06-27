@@ -6,6 +6,8 @@
 
 // "nigga'lippin that bitch" defined as, "swiped that shit and then slobbered all over her" #racist
 
+// copy this design for a test: http://thelackoforiginality.tumblr.com/
+
 function telescopic(txt, expander) {
 	var first = txt.indexOf('['),
 		last = txt.indexOf(']'),
@@ -72,7 +74,7 @@ TUMBLR = {
 	total: -1,
 	data_callback: null,
 	callback_offset: -1,
-	block_size: 6,
+	block_size: 20,
 	gallery: null,
 	gallery_control : function(gallery) {
 		console.log("TUMBLR.gallery_control", gallery);

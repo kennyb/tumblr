@@ -70,6 +70,24 @@ td {
   /*overflow: hidden;*/
 
 }
+.controls {
+  clear: both;
+  float: left;
+}
+.posts {
+  clear: both;
+  float: left;
+  width: auto;
+}
+.post {
+  padding: 5px;
+  border: solid 1px #000;
+  width: 500px;
+  float: left;
+}
+.post div {
+  width: 500px;
+}
 .menu li {
   display: inline;
   padding-left: 10px;

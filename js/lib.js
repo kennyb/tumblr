@@ -142,7 +142,6 @@ function discard(element) {
 	garbageBin.innerHTML = '';
 }
 
-
 function show(id, st) {
 	if(!st) {
 		st = '';

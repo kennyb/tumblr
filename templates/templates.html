@@ -29,6 +29,8 @@
 	</div>
 	<div><a href="#/tumblr/photo/hamsternipples">hamsternipples</a></div>
 	<div><a href="#/tumblr/photo/thenastygal">thenastygal</a></div>
+	<div><a href="#/tumblr/photo/her-imperfections">her-imperfections</a></div>
+	<div><a href="#/tumblr/photo/middlefingersandshortskirts">middlefingersandshortskirts</a></div>
 	<div><a href="#/tumblr/photo/threewordphrase">threewordphrase</a></div>
 	<div><a href="#/tumblr/photo/thelackoforiginality">thelackoforiginality</a></div>
 	<div><a href="#/tumblr/photo/cheaper-than-therapy">cheaper-than-therapy</a></div>
@@ -47,7 +49,7 @@
 			page: 'tumblr_entry',
 			pager: 'pager',
 			page_offset: 0,
-			page_size: 3,
+			page_size: 20,
 			controller: TUMBLR.gallery_control,
 			fetch: TUMBLR.fetch,
 			render: TUMBLR.render
@@ -71,20 +73,18 @@
 			<li><?=SKIN.link('*/video/*', 'videos')?></li>
 		</ul>
 	</div>
-	<div>
+	<div class="controls">
 		<button onclick="<?=d.pager_start()?>"><?="|<<"?></button>
 		<button onclick="<?=d.pager_back()?>"><?="<<"?></button>
 		<?=SKIN.global('tumblr.cur')?> of <?=SKIN.global('tumblr.total')?>
 		<button onclick="<?=d.pager_forward()?>"><?=">>"?></button>
 		<button onclick="<?=d.pager_end()?>"><?=">>|"?></button>
 	</div>
-	<div>
-		<?=SKIN.global('tumblr.posts')?>
-	</div>
+	<?=SKIN.global('tumblr.posts', cE('div', {c: 'posts'}))?>
 </xmp>
 
 <xmp id="tumblr_entry">
-	<div>
+	<div class="post post_<?=d.type?>">
 		<?
 		if(d.type === "regular") {
 			?>
@@ -113,7 +113,8 @@
 			<?
 		} else if(d.type === "photo") {
 			?>
-			<img src="<?=d['photo-url-1280']?>" alt="<?=d['photo-caption']?>" />
+			<img src="<?=d['photo-url-500']?>" />
+			<div html="<?=d['photo-caption']?>"></div>
 			<?
 		} else if(d.type === "conversation") {
 			?>
