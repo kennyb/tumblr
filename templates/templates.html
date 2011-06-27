@@ -49,7 +49,7 @@
 			page: 'tumblr_entry',
 			pager: 'pager',
 			page_offset: 0,
-			page_size: 20,
+			page_size: 4,
 			controller: TUMBLR.gallery_control,
 			fetch: TUMBLR.fetch,
 			render: TUMBLR.render
@@ -64,13 +64,13 @@
 	</div>
 	<div>
 		<ul class="menu">
-			<li><?=SKIN.link('*/all/*', 'all')?></li>
-			<li><?=SKIN.link('*/text/*', 'blog')?></li>
-			<li><?=SKIN.link('*/photo/*', 'photos')?></li>
-			<li><?=SKIN.link('*/link/*', 'links')?></li>
-			<li><?=SKIN.link('*/chat/*', 'chats')?></li>
-			<li><?=SKIN.link('*/audio/*', 'audio')?></li>
-			<li><?=SKIN.link('*/video/*', 'videos')?></li>
+			<li><?=SKIN.link('*/all/*', 'all')?> (<?=SKIN.global('tumblr.all.total',0,0)?>)</li>
+			<li><?=SKIN.link('*/text/*', 'blog')?> (<?=SKIN.global('tumblr.text.total',0,0)?>)</li>
+			<li><?=SKIN.link('*/photo/*', 'photos')?> (<?=SKIN.global('tumblr.photo.total',0,0)?>)</li>
+			<li><?=SKIN.link('*/link/*', 'links')?> (<?=SKIN.global('tumblr.link.total',0,0)?>)</li>
+			<li><?=SKIN.link('*/chat/*', 'chats')?> (<?=SKIN.global('tumblr.chat.total',0,0)?>)</li>
+			<li><?=SKIN.link('*/audio/*', 'audio')?> (<?=SKIN.global('tumblr.audio.total',0,0)?>)</li>
+			<li><?=SKIN.link('*/video/*', 'videos')?> (<?=SKIN.global('tumblr.video.total',0,0)?>)</li>
 		</ul>
 	</div>
 	<div class="controls">
@@ -93,7 +93,7 @@
 			<?
 		} else if(d.type === "link") {
 			?>
-			<a href="<?=d['link-url']?>"><?=d['link-text']?></a>
+			<a href="<?=d['link-url']?>" target="_blank"><?=d['link-text']?></a>
 			<?
 			if(d['link-decription']) {
 				?><div html="<?=d['link-decription']?>"></div><?
@@ -137,7 +137,7 @@
 			<div html="<?=d['video-player']?>"></div>
 			<?
 		} else {
-			console.log(d);
+			console.log("unknown post type:", d);
 		}
 		?>
 	</div>

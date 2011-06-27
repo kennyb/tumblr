@@ -33,8 +33,8 @@ var SKIN = {
 			SKIN.globals[k].push(e);
 		}
 		
-		if(v) {
-			SKIN.set_global(k, v);
+		if(typeof v !== 'undefined') {
+			SKIN.set_global(k, v, true);
 		}
 		
 		return e;

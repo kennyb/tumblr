@@ -68,12 +68,11 @@ function telescopic(txt, expander) {
 // add this: http://threewordphrase.com/youare.htm (it's hard though, because it's not tumblr or has an api)
 
 TUMBLR = {
-	user: 'thelackoforiginality', //cheaper-than-therapy, gingerphobia, thelackoforiginality, myreto
+	user: 'thelackoforiginality',
 	type: 'photo',
-	posts: [],
-	total: -1,
+	posts: {},
+	total: {},
 	data_callback: null,
-	callback_offset: -1,
 	block_size: 20,
 	gallery: null,
 	gallery_control : function(gallery) {
@@ -96,10 +95,9 @@ TUMBLR = {
 			reset = true;
 		}
 		
-		if(reset) {
-			TUMBLR.posts = [];
-			TUMBLR.total = -1;
-			TUMBLR.callback_offset = -1;
+		if(reset || !TUMBLR.posts[type]) {
+			TUMBLR.posts[type] = [];
+			//TUMBLR.total[type] = -1;
 		}
 		
 		console.log("TUMBLR.load", type, user, reset);
@@ -121,9 +119,10 @@ TUMBLR = {
 	},
 	fetch : function(page_offset, page_size, data_callback, force) {
 		var total = TUMBLR.total,
+			type = TUMBLR.type,
 			block_size = TUMBLR.block_size,
 			block_offset = page_offset,
-			posts = TUMBLR.posts.slice(page_offset, page_offset + page_size),
+			posts = TUMBLR.posts[type] ? TUMBLR.posts[type].slice(page_offset, page_offset + page_size) : [],
 			i = posts.length-1;
 		
 		console.log("TUMBLR.fetch", page_offset, page_size, posts.length, data_callback);
@@ -145,12 +144,12 @@ TUMBLR = {
 		
 		if(!force) {
 			// preload next block
-			if(TUMBLR.total === -1) {
+			if(typeof TUMBLR.total[type] === 'undefined') {
 				page_offset = 0;
 				total = 1;
 			} else {
 				block_offset = page_offset - (page_offset % block_size);
-				posts = TUMBLR.posts.slice(page_offset, page_offset + block_size);
+				posts = TUMBLR.posts[type].slice(page_offset, page_offset + block_size);
 				i = posts.length-1;
 				if(i >= 0) {
 					do {
@@ -182,13 +181,13 @@ TUMBLR = {
 	},
 	get : function(page_offset, page_size, data_callback) {
 		var block_size = TUMBLR.block_size,
-			total = TUMBLR.total,
+			type = TUMBLR.type,
+			total = TUMBLR.total[type] || -1,
 			offset = page_offset - (page_offset % block_size),
 			s;
 		
-		console.log("TUMBLR.get", TUMBLR.callback_offset, offset, TUMBLR.total)
-		if(TUMBLR.callback_offset === -1 && (total < 0 || offset < total)) {
-			TUMBLR.callback_offset = offset;
+		console.log("TUMBLR.get", offset, total, TUMBLR.data_callback);
+		if(TUMBLR.data_callback === null && (total < 0 || offset < total)) {
 			if(data_callback) {
 				TUMBLR.data_callback = data_callback;
 			}
@@ -202,7 +201,7 @@ TUMBLR = {
 				type: 'text/javascript',
 				async: true,
 				id: 's_'+TUMBLR.type + page_offset,
-				src: 'http://'+TUMBLR.user+'.tumblr.com/api/read/json?callback=TUMBLR.fetchback&num='+block_size+(type !== 'all' ? '&type='+TUMBLR.type : '')+'&start='+TUMBLR.callback_offset,
+				src: 'http://'+TUMBLR.user+'.tumblr.com/api/read/json?callback=TUMBLR.fetchback&num='+block_size+(type !== 'all' ? '&type='+type : '')+'&start='+offset,
 			});
 			
 			d.parentNode.insertBefore(s, d);
@@ -215,48 +214,53 @@ TUMBLR = {
 	},
 	fetchback : function(d) {
 		var posts = d.posts,
-			offset = TUMBLR.callback_offset,
+			type = d["posts-type"] || 'all',
+			total = TUMBLR.total[type],
+			offset = d["posts-start"]*1,
+			total = d["posts-total"]*1,
+			callback = TUMBLR.data_callback,
 			end = posts.length + d["posts-start"],
 			e = $_('s_' + d["posts-type"] + d["posts-start"]),
 			i = offset, j = 0;
 		
-		console.log("TUMBLR.fetchback " + 's_'+d["posts-type"]+d["posts-start"], TUMBLR.callback_offset);
+		console.log("TUMBLR.fetchback " + 's_'+type+offset, offset);
 		if(e) {
 			e.parentNode.removeChild(e);
 		}
 		
-		TUMBLR.callback_offset = -1;
 		//TODO: check to see if this number has changed
-		if(TUMBLR.total === -1) {
-			TUMBLR.posts = posts;
+		if(TUMBLR.total[type] === -1) {
+			TUMBLR.posts[type] = posts;
 			TUMBLR.gallery.total(d["posts-total"]*1);
-			TUMBLR.total = d["posts-total"]*1;
+			TUMBLR.total[type] = total;
 		} else {
-			console.log("totals", TUMBLR.total, d["posts-total"])
-			while(TUMBLR.total < d["posts-total"]) {
-				TUMBLR.posts.unshift(null);
-				TUMBLR.total++;
+			console.log("totals", TUMBLR.total, d["posts-total"]);
+			while(total < d["posts-total"]) {
+				TUMBLR.posts[type].unshift(null);
+				//TUMBLR.total++;
 				offset++;
 				i++;
 			}
 		
 			//console.log("posts:", offset, posts.length, TUMBLR.posts.length);
 			//TUMBLR.posts.splice.apply(TUMBLR.posts, [offset, 0].concat(posts));
-			if(offset === TUMBLR.posts.length) {
-				TUMBLR.posts = TUMBLR.posts.concat(posts);
+			if(offset === TUMBLR.posts[type].length) {
+				TUMBLR.posts[type] = TUMBLR.posts[type].concat(posts);
 			} else {
 				for(; i < end; i++) {
-					TUMBLR.posts[i] = i >= offset ? posts[j++] : null;
+					TUMBLR.posts[type][i] = i >= offset ? posts[j++] : null;
 				}
 			}
 		}
 		
-		if(TUMBLR.data_callback) {
-			TUMBLR.data_callback(d);
+		if(callback) {
+			callback(d);
+			TUMBLR.data_callback = null;
 		}
 		
 		SKIN.set_global('tumblr.title', d.tumblelog.title);
-		SKIN.set_global('tumblr.total', d["posts-total"]);
+		SKIN.set_global('tumblr.total', total);
+		SKIN.set_global('tumblr.'+type+'.total', total);
 		//SKIN.set_global('tumblr.about', telescopic("greetings! [my name is|they call me on earth] [kenny|!![kenneth|kenneth edward bentley, by birth]..]. thank you"));
 		// TODO, delete the script element from the dom on the callback
 	}

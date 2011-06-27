@@ -17,7 +17,7 @@ function display(elem, show) {
 }
 
 function aC(e, value) {
-	if(!value) return;
+	if(typeof value === 'undefined') return;
 	if(value.constructor == Array) {
 		for(var i = 0, len = value.length; i < len; i++) {
 			aC(e, value[i]);
