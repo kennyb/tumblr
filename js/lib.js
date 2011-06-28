@@ -287,6 +287,7 @@ SERVER = {
 
 STATEMANAGER = {
 	panel: null,
+	unload: null,
 	start : function() {
 		clearInterval(STATEMANAGER.timer);
 		STATEMANAGER.timer = setInterval(function() { STATEMANAGER.check() }, 50);
@@ -312,7 +313,11 @@ STATEMANAGER = {
 		}
 	},
 	loadPanel : function(panel, params) {
-		//TODO: unload panel function
+		var f = STATEMANAGER.unload;
+		if(typeof f === 'function') {
+			f();
+		}
+		
 		if(panel) {
 			var intercept = STATEMANAGER.intercept[panel];
 			if(intercept) {

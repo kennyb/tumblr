@@ -75,8 +75,19 @@ TUMBLR = {
 	data_callback: null,
 	block_size: 20,
 	gallery: null,
+	start : function() {
+		
+	},
 	gallery_control : function(gallery) {
 		TUMBLR.gallery = gallery;
+		STATEMANAGER.unload = TUMBLR.unload;
+		window.onscroll = function(e) {
+			var scrollMaxY = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+			//console.log("onscroll", e, window.scrollMaxY - window.scrollY, window.scrollY, scrollMaxY);
+			if(scrollMaxY - window.scrollY < 100) {
+				//TUMBLR.gallery.pager_forward(1);
+			}
+		};
 	},
 	load : function(panel, params) {
 		console.log("TUMBLR.load - ", params);
@@ -108,30 +119,34 @@ TUMBLR = {
 		
 		console.log("TUMBLR.load", type, user, reset);
 		if(SKIN.global_exists("gallery.tumblr_gallery")) {
-			TUMBLR.gallery.page_offset = 0;
-			TUMBLR.fetch(reset ? 0 : TUMBLR.gallery.page_offset, TUMBLR.gallery.page_size, TUMBLR.gallery.render);
+			TUMBLR.gallery.pager_start();
 		} else {
 			SKIN.template("tumblr", {args: params}, $_('content'));
 		}
 	},
-	render : function(page_offset, page_size, posts) {
-		console.log("TUMBLR.render", page_offset, page_size, posts);
+	unload : function() {
+		window.onscroll = null;
+	},
+	render : function(posts, append) {
+		console.log("TUMBLR.render", posts, append);
 		if(posts) {
-			SKIN.set_global('tumblr.cur', page_offset+1);
-			SKIN.set_global('tumblr.posts', SKIN.template('tumblr_entry', posts), 1, 0);
+			SKIN.set_global('tumblr.start', TUMBLR.gallery.start_offset+1);
+			SKIN.set_global('tumblr.end', TUMBLR.gallery.end_offset+1);
+			SKIN.set_global('tumblr.posts', SKIN.template('tumblr_entry', posts), 0, append);
 		} else {
 			// no posts
 		}
 	},
-	fetch : function(page_offset, page_size, data_callback, force) {
+	fetch : function(start_offset, end_offset, data_callback, force, append) {
 		var type = TUMBLR.type,
 			total = TUMBLR.total[type],
 			block_size = TUMBLR.block_size,
-			block_offset = page_offset,
-			posts = TUMBLR.posts[type] ? TUMBLR.posts[type].slice(page_offset, page_offset + page_size) : [],
+			page_size = end_offset - start_offset,
+			block_offset = start_offset,
+			posts = TUMBLR.posts[type] ? TUMBLR.posts[type].slice(start_offset, end_offset) : [],
 			i = posts.length-1;
 		
-		console.log("TUMBLR.fetch", type, page_offset, page_size, posts.length, data_callback);
+		console.log("TUMBLR.fetch", type, start_offset, end_offset, posts.length, force, append);
 		// remove null values
 		if(i >= 0) {
 			do {
@@ -142,18 +157,19 @@ TUMBLR = {
 		}
 		
 		if(posts.length === page_size) {
-			data_callback(page_offset, page_size, posts);
+			data_callback(posts, append);
 		} else {
 			//TODO: I think there's something that goes here
+			//debugger;
 		}
 		
 		if(!force) {
 			// preload next block
 			if(typeof TUMBLR.total[type] === 'undefined') {
-				page_offset = 0;
+				start_offset = 0;
 				total = 1;
 			} else {
-				block_offset = page_offset - (page_offset % block_size);
+				block_offset = start_offset - (start_offset % block_size);
 				posts = TUMBLR.posts[type].slice(block_offset, block_offset + block_size);
 				i = posts.length-1;
 				if(i >= 0) {
@@ -165,20 +181,20 @@ TUMBLR = {
 				}
 			}
 			
-			if(posts.length === page_size && (page_offset % block_size) / block_size > 0.5) {
+			if(posts.length === page_size && (start_offset % block_size) / block_size > 0.5) {
 				block_offset += block_size;
 			}
 			
-			//console.log("TUMBLR.fetch", posts.length, page_offset, block_offset, block_size, total);
-			if(posts.length !== block_size && page_offset < total) {
-				TUMBLR.get(block_offset, block_size, function(page_offset, block_offset) {
+			//console.log("TUMBLR.fetch", posts.length, start_offset, block_offset, block_size, total);
+			if(posts.length !== block_size && start_offset < total) {
+				TUMBLR.get(block_offset, block_size, function(start_offset, end_offset) {
 					return function(data) {
-						console.log("TUMBLR.get(callback)", TUMBLR.gallery.page_offset, page_offset, "|", block_offset);
-						if(TUMBLR.gallery.page_offset === page_offset) {
-							TUMBLR.fetch(page_offset, page_size, data_callback, true);
+						console.log("TUMBLR.get(callback)", TUMBLR.gallery.end_offset, start_offset, "|", block_offset);
+						if(end_offset === TUMBLR.gallery.end_offset) {
+							TUMBLR.fetch(start_offset, end_offset, data_callback, true, append);
 						}
 					};
-				}(page_offset, block_offset));
+				}(start_offset, end_offset));
 			}
 		} else {
 			//TODO: we attempted to fetch the data but it was not available for some reason. show an error
@@ -233,9 +249,9 @@ TUMBLR = {
 		}
 		
 		//TODO: check to see if this number has changed
+		TUMBLR.gallery.total(total);
 		if(ttotal === -1 || typeof ttotal === 'undefined') {
 			TUMBLR.posts[type] = posts;
-			TUMBLR.gallery.total(total);
 			TUMBLR.total[type] = total;
 		} else {
 			console.log("totals", TUMBLR.total[type], d["posts-total"]);

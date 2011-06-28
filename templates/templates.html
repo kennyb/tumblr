@@ -53,7 +53,8 @@
 			template: 'tumblr_gallery',
 			page: 'tumblr_entry',
 			pager: 'pager',
-			page_offset: 0,
+			start_offset: 0,
+			end_offset: 10,
 			page_size: 5,
 			controller: TUMBLR.gallery_control,
 			fetch: TUMBLR.fetch,
@@ -81,7 +82,7 @@
 	<div class="controls">
 		<button onclick="<?=d.pager_start()?>"><?="|<<"?></button>
 		<button onclick="<?=d.pager_back()?>"><?="<<"?></button>
-		<?=SKIN.global('tumblr.cur')?> of <?=SKIN.global('tumblr.total')?>
+		<?=SKIN.global('tumblr.start')?>-<?=SKIN.global('tumblr.end')?> of <?=SKIN.global('tumblr.total')?>
 		<button onclick="<?=d.pager_forward()?>"><?=">>"?></button>
 		<button onclick="<?=d.pager_end()?>"><?=">>|"?></button>
 	</div>
@@ -128,8 +129,8 @@
 			<?
 		} else if(d.type === "answer") {
 			?>
-			<h1><?=d['question']?></h1>
-			<h2 html="<?=d['answer']?>"></h2>
+			<h1 html="<?=d.question?>"></h1>
+			<h2 html="<?=d.answer?>"></h2>
 			<?
 		} else if(d.type === "audio") {
 			?>
