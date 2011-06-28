@@ -80,14 +80,6 @@ TUMBLR = {
 	},
 	gallery_control : function(gallery) {
 		TUMBLR.gallery = gallery;
-		STATEMANAGER.unload = TUMBLR.unload;
-		window.onscroll = function(e) {
-			var scrollMaxY = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-			//console.log("onscroll", scrollMaxY - window.scrollY);
-			if(scrollMaxY - window.scrollY < 100) {
-				TUMBLR.gallery.pager_forward(1);
-			}
-		};
 	},
 	load : function(panel, params) {
 		console.log("TUMBLR.load - ", params);
@@ -123,8 +115,18 @@ TUMBLR = {
 		} else {
 			SKIN.template("tumblr", {args: params}, $_('content'));
 		}
+		
+		STATEMANAGER.unload = TUMBLR.unload;
+		window.onscroll = function(e) {
+			var scrollMaxY = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+			//console.log("onscroll", scrollMaxY - window.scrollY);
+			if(scrollMaxY - window.scrollY < 100) {
+				TUMBLR.gallery.pager_forward(1);
+			}
+		};
 	},
 	unload : function() {
+		//debugger;
 		window.onscroll = null;
 	},
 	render : function(posts, append) {
