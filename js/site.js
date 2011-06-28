@@ -9,28 +9,37 @@ var SKIN = {
 	gc : function() {
 		// this isn't really necessary right now.
 		// I do believe on a semi regular basis (maybe once every 5 minutes or so) I think we should try and do as much cleaning as possible
-		for(var key in SKIN.globals) {
+		SKIN.globals.forEach(function(v, key, a) {
 			var v = SKIN.globals[key];
 			for(var i = 0; i < v.length; i++) {
 				if(!LIB.inDom(v[i])) {
-					SKIN.globals[key].splice(i, 1);
+					a[key].splice(i, 1);
 				}
 				
 				if(!v.length) {
-					delete SKIN.globals[key];
+					delete a[key];
 				}
 			}
-		}
+		});
 	},
 	global : function(k, e, v) {
+		var a = SKIN.globals,
+			c = a[k];
 		if(!e) {
 			e = cE('span');
 		}
 		
+		//SKIN.gc();
 		//console.log("global: "+k);
-		if(typeof SKIN.globals[k] === 'undefined') {
+		if(typeof c === 'undefined') {
 			SKIN.globals[k] = [e];
 		} else {
+			for(var i = 0; i < c.length; i++) {
+				if(!LIB.inDom(c[i])) {
+					a[k].splice(i, 1);
+				}
+			}
+			
 			SKIN.globals[k].push(e);
 		}
 		
@@ -54,7 +63,7 @@ var SKIN = {
 		
 		return false;
 	},
-	set_global : function(k, v, force) {
+	set_global : function(k, v, force, append) {
 		var els = SKIN.globals[k],
 			i,	e;
 		
@@ -66,7 +75,10 @@ var SKIN = {
 					if(typeof v === 'undefined') {
 						LIB.hide(e);
 					} else {
-						LIB.emptyNode(e);
+						if(!append) {
+							LIB.emptyNode(e);
+						}
+						
 						aC(e, typeof v === 'function' ? v(e) : v);
 						LIB.show(e);
 					}
@@ -119,23 +131,23 @@ var SKIN = {
 				els = SKIN.global_exists("link."+link_key),
 				i, lk, ll, href;
 			
-			for(i = 0; i < key_len; i++) {
-				lk = key[i];
-				if(lk.charAt(0) === '*' && lk.charAt(1) === '|') {
-					ll = lk.substr(2);
-					lk = '*';
-				}
+			if(params[0] === key[0]) {
+				for(i = 0; i < key_len; i++) {
+					lk = key[i];
+					if(lk.charAt(0) === '*' && lk.charAt(1) === '|') {
+						ll = lk.substr(2);
+						lk = '*';
+					}
 				
-				p = params[i];
-				link[i] = lk === '*' ? (!!p ? p : ll) : lk;
-			}
+					p = params[i];
+					link[i] = lk === '*' ? (!!p ? p : ll) : lk;
+				}
 			
-			href = "#/"+link.join('/');
-			for(i = 0; i < els.length; i++) {
-				els[i].href = href;
+				href = "#/"+link.join('/');
+				for(i = 0; i < els.length; i++) {
+					els[i].href = href;
+				}
 			}
-			
-			//SKIN.set_global("link."+link_key, link.join('/'));
 		});
 	},
 	get_template : function(tpl, txt) {
@@ -507,7 +519,7 @@ var SKIN = {
 			page_total = opts.page_total || 1,
 			render_func = opts.render,
 			fetch_func = opts.fetch,
-			element = SKIN.global("gallery."+template_id, cE("div", {empty: 1}, "Loading...")),
+			element = SKIN.global("gallery."+template_id, cE("div", 0, "Loading...")),
 			render_callback = function(template_id) {
 				var lib = {
 					fetch: fetch_func,
@@ -557,7 +569,7 @@ var SKIN = {
 				// render_callback
 				return function(page_offset, page_size, data) {
 					console.log("render_callback", "gallery."+template_id, data);
-					SKIN.set_global("gallery."+template_id, SKIN.template(template_id, lib), true);
+					SKIN.set_global("gallery."+template_id, SKIN.template(template_id, lib), 1);
 					render_func(page_offset, page_size, data);
 				};
 			}(template_id);
@@ -566,6 +578,7 @@ var SKIN = {
 			fetch_func(page_offset, page_size, render_callback);
 		}, 0);
 		
+		element.empty = 1;
 		return element;
 	},
 	subscribe : function(event_id, template_id, element_id, callback) {

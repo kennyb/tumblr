@@ -76,7 +76,6 @@ TUMBLR = {
 	block_size: 20,
 	gallery: null,
 	gallery_control : function(gallery) {
-		console.log("TUMBLR.gallery_control", gallery);
 		TUMBLR.gallery = gallery;
 	},
 	load : function(panel, params) {
@@ -119,7 +118,7 @@ TUMBLR = {
 		console.log("TUMBLR.render", page_offset, page_size, posts);
 		if(posts) {
 			SKIN.set_global('tumblr.cur', page_offset+1);
-			SKIN.set_global('tumblr.posts', SKIN.template('tumblr_entry', posts));
+			SKIN.set_global('tumblr.posts', SKIN.template('tumblr_entry', posts), 1, 0);
 		} else {
 			// no posts
 		}
@@ -155,7 +154,7 @@ TUMBLR = {
 				total = 1;
 			} else {
 				block_offset = page_offset - (page_offset % block_size);
-				posts = TUMBLR.posts[type].slice(page_offset, page_offset + block_size);
+				posts = TUMBLR.posts[type].slice(block_offset, block_offset + block_size);
 				i = posts.length-1;
 				if(i >= 0) {
 					do {
@@ -251,10 +250,8 @@ TUMBLR = {
 			//TUMBLR.posts.splice.apply(TUMBLR.posts, [offset, 0].concat(posts));
 			if(offset === TUMBLR.posts[type].length) {
 				TUMBLR.posts[type] = TUMBLR.posts[type].concat(posts);
-			} else {
-				for(; i < end; i++) {
-					TUMBLR.posts[type][i] = i >= offset ? posts[j++] : null;
-				}
+			} else for(; i < end; i++) {
+				TUMBLR.posts[type][i] = i >= offset ? posts[j++] : null;
 			}
 		}
 		
