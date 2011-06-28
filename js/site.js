@@ -522,8 +522,18 @@ var SKIN = {
 			element = SKIN.global("gallery."+template_id, cE("div", 0, "Loading...")),
 			render_callback = function(template_id) {
 				var lib = {
-					fetch: fetch_func,
-					render: render_func,
+					fetch: function() {
+						if(!lib.fetching) {
+							lib.fetching = true;
+							console.log("fetching ON");
+							fetch_func.apply(this, arguments);
+						}
+					},
+					render: function() {
+						lib.fetching = false;
+						console.log("fetching OFF");
+						render_func.apply(this, arguments);
+					},
 					start_offset: start_offset,
 					end_offset: end_offset,
 					page_size: page_size,
@@ -564,7 +574,7 @@ var SKIN = {
 							lib.start_offset = lib.end_offset - lib.page_size;
 						}
 						
-						lib.fetch(append ? lib.end_offset-lib.page_size : lib.start_offset, lib.end_offset, lib.render, append);
+						lib.fetch(append ? lib.end_offset-lib.page_size : lib.start_offset, lib.end_offset, lib.render, 0, append);
 					},
 					pager_end: function() {
 						lib.start_offset = lib.page_total - (lib.page_total % lib.page_size);
@@ -582,10 +592,10 @@ var SKIN = {
 				}
 				
 				// render_callback
-				return function(page_offset, page_size, data) {
+				return function(start_offset, end_offset, data) {
 					console.log("render_callback", "gallery."+template_id, data);
 					SKIN.set_global("gallery."+template_id, SKIN.template(template_id, lib), 1);
-					render_func(page_offset, page_size, data);
+					render_func(start_offset, end_offset, data);
 				};
 			}(template_id);
 		

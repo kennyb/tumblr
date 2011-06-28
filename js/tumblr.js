@@ -83,9 +83,9 @@ TUMBLR = {
 		STATEMANAGER.unload = TUMBLR.unload;
 		window.onscroll = function(e) {
 			var scrollMaxY = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-			//console.log("onscroll", e, window.scrollMaxY - window.scrollY, window.scrollY, scrollMaxY);
+			//console.log("onscroll", scrollMaxY - window.scrollY);
 			if(scrollMaxY - window.scrollY < 100) {
-				//TUMBLR.gallery.pager_forward(1);
+				TUMBLR.gallery.pager_forward(1);
 			}
 		};
 	},
@@ -187,14 +187,14 @@ TUMBLR = {
 			
 			//console.log("TUMBLR.fetch", posts.length, start_offset, block_offset, block_size, total);
 			if(posts.length !== block_size && start_offset < total) {
-				TUMBLR.get(block_offset, block_size, function(start_offset, end_offset) {
+				TUMBLR.get(block_offset, block_size, function(start_offset, end_offset, append) {
 					return function(data) {
 						console.log("TUMBLR.get(callback)", TUMBLR.gallery.end_offset, start_offset, "|", block_offset);
-						if(end_offset === TUMBLR.gallery.end_offset) {
+						if(end_offset === TUMBLR.gallery.end_offset || append) {
 							TUMBLR.fetch(start_offset, end_offset, data_callback, true, append);
 						}
 					};
-				}(start_offset, end_offset));
+				}(start_offset, end_offset, append));
 			}
 		} else {
 			//TODO: we attempted to fetch the data but it was not available for some reason. show an error
@@ -240,7 +240,7 @@ TUMBLR = {
 			total = d["posts-total"]*1,
 			callback = TUMBLR.data_callback,
 			end = posts.length + d["posts-start"],
-			e = $_('s_' + d["posts-type"] + d["posts-start"]),
+			e = $_('s_'+type+offset),
 			i = offset, j = 0;
 		
 		console.log("TUMBLR.fetchback " + 's_'+type+offset, offset);
@@ -248,7 +248,6 @@ TUMBLR = {
 			e.parentNode.removeChild(e);
 		}
 		
-		//TODO: check to see if this number has changed
 		TUMBLR.gallery.total(total);
 		if(ttotal === -1 || typeof ttotal === 'undefined') {
 			TUMBLR.posts[type] = posts;
@@ -257,12 +256,10 @@ TUMBLR = {
 			console.log("totals", TUMBLR.total[type], d["posts-total"]);
 			while(total < d["posts-total"]) {
 				TUMBLR.posts[type].unshift(null);
-				//TUMBLR.total++;
 				offset++;
 				i++;
 			}
 		
-			//console.log("posts:", offset, posts.length, TUMBLR.posts.length);
 			//TUMBLR.posts.splice.apply(TUMBLR.posts, [offset, 0].concat(posts));
 			if(offset === TUMBLR.posts[type].length) {
 				TUMBLR.posts[type] = TUMBLR.posts[type].concat(posts);
@@ -280,6 +277,5 @@ TUMBLR = {
 		SKIN.set_global('tumblr.total', total);
 		SKIN.set_global('tumblr.'+type+'.total', total);
 		//SKIN.set_global('tumblr.about', telescopic("greetings! [my name is|they call me on earth] [kenny|!![kenneth|kenneth edward bentley, by birth]..]. thank you"));
-		// TODO, delete the script element from the dom on the callback
 	}
 }
