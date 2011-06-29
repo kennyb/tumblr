@@ -344,25 +344,31 @@ LIB = {
 		md5 : null,
 		lang : null
 	},
+	loadTemplates : function(url, callback) {
+		var r = new XMLHttpRequest();
+		r.open('GET', "templates/templates.html");
+		r.onreadystatechange = function() {
+			if(this.readyState === 4 && typeof callback === 'function') {
+				callback(this);
+			}
+		};
+		r.send();
+		return r;
+	},
 	loadLibs : function(libs) {
 		for(var i in libs) {
 			if(libs[i]) {
 				LIB.loadedLibs[i] = false;
 				switch(i) {
 					case 'templates':
-						var r = new XMLHttpRequest();
-						r.open('GET', "templates/templates.html");
-						r.onreadystatechange = function() {
-							if(this.readyState === 4) {
-								if(this.status === 200) {
-									LIB.parseTemplates(this.responseText);
-									LIB.loadedLib({templates: true});
-								} else {
-									//error
-								}
+						LIB.loadTemplates("templates/templates.html", function(r) {
+							if(r.status === 200) {
+								LIB.parseTemplates(r.responseText);
+								LIB.loadedLib({templates: true});
+							} else {
+								//error
 							}
-						};
-						r.send();
+						});
 					break;
 				}
 			}
