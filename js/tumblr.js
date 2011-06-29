@@ -8,7 +8,7 @@
 
 // copy this design for a test: http://thelackoforiginality.tumblr.com/
 
-function telescopic(txt, expander) {
+function telescopic(txt, expander, callback) {
 	var first = txt.indexOf('['),
 		last = txt.indexOf(']'),
 		lindent, rindent, divider,
@@ -18,6 +18,10 @@ function telescopic(txt, expander) {
 		expander = function(original, new_txt) {
 			return [
 				cE('span', {c: 'expand', onclick: function() {
+					if(typeof callback === 'function') {
+						callback(this, original);
+					}
+					
 					//LIB.cleanNode(this);
 					LIB.removeClass(this.nextSibling, 'contract');
 					LIB.hide(this);
@@ -33,7 +37,7 @@ function telescopic(txt, expander) {
 		if(divider !== -1) {
 			return expander(left.substr(0, divider), gen_span(left.substr(divider+1), middle, right));
 		} else if((divider = middle.indexOf('|')) !== -1) {
-			return [left, expander(middle.substr(0, divider), telescopic(middle.substr(divider+1)), expander), telescopic(right, expander)];
+			return [left, expander(middle.substr(0, divider), telescopic(middle.substr(divider+1), expander, callback)), telescopic(right, expander, callback)];
 		} else {
 			return [left, middle, right];
 		}
