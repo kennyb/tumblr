@@ -154,7 +154,7 @@ var SKIN = {
 		var fn = null;
 		
 		function arg_vars(str) {
-			str = ('"'+str.replace(/\{\{\{\{(.*?)\}\}\}\}/g, function(nothing, variable) {
+			str = ('"'+LIB.str_replace(str, '"', '\\"').replace(/\{\{\{\{(.*?)\}\}\}\}/g, function(nothing, variable) {
 				return '",'+variable+',"';
 			})+'"').replace(/\{\{(.*?)\}\}/g, function(nothing, variable) {
 				// debug for kenny
@@ -177,7 +177,7 @@ var SKIN = {
 		}
 		
 		function concat_vars(str) {
-			str = ('"'+str.replace(/\{\{\{\{(.*?)\}\}\}\}/g, function(nothing, variable) {
+			str = ('"'+LIB.str_replace(str, '"', '\\"').replace(/\{\{\{\{(.*?)\}\}\}\}/g, function(nothing, variable) {
 				return '"+'+variable+'+"';
 			})+'"').replace(/\{\{(.*?)\}\}/g, function(nothing, variable) {
 				// debug for kenny
