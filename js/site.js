@@ -673,6 +673,11 @@ var SKIN = {
 			opts.value = _default_text;
 		}
 		
+		if(opts.c) {
+			_active_class += " "+opts.c
+			_inactive_class += " "+opts.c
+		}
+		
 		opts.c = _value ? _active_class : _inactive_class;
 		
 		// I know that if onfocus is not set, this is a waste of memory... don't care right now.
