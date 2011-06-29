@@ -154,8 +154,8 @@ var SKIN = {
 		var fn = null;
 		
 		function arg_vars(str) {
-			str = ('"'+LIB.str_replace(str, '"', '\\"').replace(/\{\{\{\{(.*?)\}\}\}\}/g, function(nothing, variable) {
-				return '",'+variable+',"';
+			str = ('"'+str.replace(/\{\{\{\{(.*?)\}\}\}\}/g, function(nothing, variable) {
+				return '",'+LIB.str_replace(variable, '\\"', '"')+',"';
 			})+'"').replace(/\{\{(.*?)\}\}/g, function(nothing, variable) {
 				// debug for kenny
 				if(DEBUG) {
@@ -176,8 +176,9 @@ var SKIN = {
 			return str;
 		}
 		
+		//LIB.str_replace(str, '"', '\\"')
 		function concat_vars(str) {
-			str = ('"'+LIB.str_replace(str, '"', '\\"').replace(/\{\{\{\{(.*?)\}\}\}\}/g, function(nothing, variable) {
+			str = ('"'+str.replace(/\{\{\{\{(.*?)\}\}\}\}/g, function(nothing, variable) {
 				return '"+'+variable+'+"';
 			})+'"').replace(/\{\{(.*?)\}\}/g, function(nothing, variable) {
 				// debug for kenny
@@ -247,7 +248,7 @@ var SKIN = {
 				console.trace();
 				//return "function(){"+(cE("x", {innerHTML: node.innerHTML}).firstChild.data)+"}";
 			} else if(node_type === "#text") {
-				return arg_vars(node.nodeValue);
+				return arg_vars(LIB.str_replace(node.nodeValue, '"', '\\"'));
 			} else {
 				var i = 0, a, attr, n,
 					attrs = [],
