@@ -361,7 +361,7 @@ LIB = {
 				LIB.loadedLibs[i] = false;
 				switch(i) {
 					case 'templates':
-						LIB.loadTemplates("templates/templates.html", function(r) {
+						LIB.loadTemplates("templates/templates.html?1", function(r) {
 							if(r.status === 200) {
 								LIB.parseTemplates(r.responseText);
 								LIB.loadedLib({templates: true});
