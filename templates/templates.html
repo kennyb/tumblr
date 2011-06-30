@@ -1,6 +1,5 @@
 
 <xmp id="home">
-	<h1>tumblr gallery</h1>
 	<p>
 		this is an example of using a template system to make a frontend for the popular blogging page, <a href="http://tumblr.com/" target="_blank">tumblr</a>.
 	</p>
@@ -10,11 +9,44 @@
 	<p>
 		-kenny (<a href="mailto:kenny@unhosted.org">kenny@unhosted.org</a>)
 	</p>
-	<p><?=telescopic("[hi|hello, how are you.] [my name is|they call me here on earth] [kenny|[k-dawg|kenneth edward bentley, by birth]], and I am a [programmer|hacker; convinced I will blow people's minds with my [programs!|..well ok, they're more like masterpieces, you're right]]")?></p>
+	<p style="padding: 11px"><?=telescopic("[hi|hello, how are you.] [my name is|they call me here on earth] [kenny|[k-dawg|kenneth edward bentley, by birth]], and I am a [programmer|hacker; convinced I will blow people's minds with my [programs!|..well ok, they're more like masterpieces, you're right]]")?></p>
+</xmp>
+
+<xmp id="login">
+	<div>
+		<?
+		console.log("hamsternipples network :: ", HN.login);
+		if(HN.login === 1) {
+			?>
+			UNHOSTED LOGIN logged in as <a href="#/hamsternipples/profile/hamsternipples">hamsternipples</a>
+			<?
+		} else if(HN.login === 2) {
+			?>
+			UNHOSTED LOGIN logged in as <a href="#/hamsternipples/profile/kenny">kenny</a>
+			<?
+		} else {
+			?>UNHOSTED LOGIN<?
+		}
+		?>
+	</div>
+	<div>
+		<?
+		if(HN.login !== 1) {
+			?>
+			<button onclick="HN.login=1;SKIN.reloadCurrentPanel()">login as hamsternipples</button>
+			<?
+		}
+		if(HN.login !== 2) {
+			?>
+			<button onclick="HN.login=2;SKIN.reloadCurrentPanel()">login as kenny</button>
+			<?
+		}
+		?>
+	</div>
 </xmp>
 
 <xmp id="sidebar">
-	<h1>random tumblogs</h1>
+	<h2>random tumblogs</h2>
 	<div>
 		<?=SKIN.global('tumblr.user', cE('input', {value: TUMBLR.user,
 		onclick: function(e) {
@@ -27,7 +59,6 @@
 			}
 		}}))?>
 	</div>
-	<div><?=SKIN.link('hamsternipples/*|home', 'hamsternipples')?></div>
 	<div><?=SKIN.link('tumblr/*|all/thenastygal', 'thenastygal')?></div>
 	<div><?=SKIN.link('tumblr/*|all/her-imperfections', 'her-imperfections')?></div>
 	<div><?=SKIN.link('tumblr/*|all/loveandaffectionnn', 'loveandaffectionnn')?></div>
@@ -37,11 +68,134 @@
 	<div><?=SKIN.link('tumblr/*|all/thelackoforiginality', 'thelackoforiginality')?></div>
 	<div><?=SKIN.link('tumblr/*|all/cheaper-than-therapy', 'cheaper-than-therapy')?></div>
 	<div><?=SKIN.link('tumblr/*|all/gingerphobia', 'gingerphobia')?></div>
+	<div><?=SKIN.link('tumblr/*|all/tomoatmeal', 'tomoatmeal')?></div>
 	<div><?=SKIN.link('tumblr/*|all/myreto', 'myreto')?></div>
+	<hr />
+	<h2>hamsternipples::network</h2>
+	<div>
+		<?=SKIN.link('hamsternipples/photos', 'photos')?> 
+		<?=SKIN.link('hamsternipples/links', 'links')?> 
+		<?=SKIN.link('hamsternipples/quotes', 'quotes')?> 
+		<?=SKIN.link('hamsternipples/playlists', 'playlists')?> 
+		<?=SKIN.link('hamsternipples/wiki', 'wiki')?> 
+		<?=SKIN.link('hamsternipples/apps', 'apps')?> 
+		<?=SKIN.link('hamsternipples/fearbin', 'fearbin')?> 
+		<?=SKIN.link('hamsternipples/timeline', 'timeline')?> 
+		<?=SKIN.link('hamsternipples/tywowd', 'TYwowD')?>
+	</div>
+	<hr />
+	<div><?=SKIN.link('hamsternipples/profile/kenny', 'kenny\'s lair')?></div>
 </xmp>
 
 <xmp id="hamsternipples">
-	coming soon...
+	<div>
+		<?
+		var panel = d.args[0] || 'home';
+		switch(panel) {
+			case 'network':
+				?>
+				<h1>hamsternipples :: network</h1>
+				<?
+				break;
+				
+			case 'home':
+				?>you are at home. this will show you your local feed. go to the <a href="#/hamsternipples/network">hamsternipples::network</a><?
+				break;
+			
+			case 'profile':
+				?><?=HN.profile(d.args[1], d)?><?
+				break;
+				
+			default:
+				?><?=SKIN.template('hamsternipples.'+panel)?><?
+		}
+		?>
+	</div>
+</xmp>
+
+<xmp id="hamsternipples.photos">
+	..the same as the tumblog photos
+</xmp>
+
+<xmp id="hamsternipples.links">
+	..the same as the tumblog links
+</xmp>
+
+<xmp id="hamsternipples.quotes">
+	..the same as the tumblog quotes
+</xmp>
+
+<xmp id="hamsternipples.playlists">
+	a place to share playlists
+</xmp>
+
+<xmp id="hamsternipples.wiki">
+	a wiki for learning
+</xmp>
+
+<xmp id="hamsternipples.apps">
+	<div>a list of useful applications</div>
+	<div>a list of ideas for applications</div>
+</xmp>
+
+<xmp id="hamsternipples.fearbin">
+	a list of people's fears
+</xmp>
+
+<xmp id="hamsternipples.timeline">
+	a collaborative timeline
+</xmp>
+
+<xmp id="hamsternipples.tywowd">
+	<h1><b>TYwowD</b>: <em>Things You</em> <b>wish others would</b> <em>Do</em></h1>
+	<p>One of the most obvious things we can all start practicing, is to start doing, "the things we wished others did."</p>
+	<p>1. start reading and find a few things that you wish others would do too</p>
+	<p>2. vote them up</p>
+	<p>3. add to the things you wish others would do</p>
+	<?=SKIN.gallery({
+		template: 'hamsternipples.tywowd.gallery',
+		page: 'hamsternipples.tywowd.entry',
+		pager: 'pager',
+		start_offset: 0,
+		end_offset: 10,
+		page_size: 5,
+		controller: TYWOWD.gallery_control,
+		fetch: TYWOWD.fetch,
+		render: TYWOWD.render
+	})?>
+	<div class="tywowd_input">
+		[I wish others would...] <?=SKIN.Textbox({c: "ttywowd", default_text: "write something you wish others would do...", onsubmit: function(e) {
+			TYWOWD.add(this.value);
+		}})?>
+	</div>
+</xmp>
+
+<xmp id="hamsternipples.tywowd.gallery">
+	...
+	<?=SKIN.global('tywowd.posts', cE('div', {c: 'posts'}))?>
+</xmp>
+
+<xmp id="hamsternipples.tywowd.entry">
+	<div class="post tywowd">
+		<p>I wish others would, <?=d.txt?>...</p>
+		<ul>
+			<li onclick="TYWOWD.del(d._id)">delete</li>
+			<li onclick="TYWOWD.voteup(d._id)">vote up (<?=d.voteup?>)</li>
+			<li onclick="TYWOWD.voteup(d._id, 1)">vote down (<?=d.votedown?>)</li>
+		</ul>
+	</div>
+</xmp>
+
+<xmp id="profile.kenny">
+	<div>hello everyone, welcome to kenny's lair.</div>
+	<div>
+		<?=telescopic("around here, we like to have [fun|[lotsa' fun|the most fun!]]", 0, function(e, txt) {
+			if(txt === "lotsa' fun") {
+				LIB.show('lotsafun');
+			}
+		})?>
+	</div>
+	<span id="lotsafun" style="display:none;padding:5px"><img width="500" src="http://a3.l3-images.myspacecdn.com/images02/120/baac606c78cd4f2e9420b7719c4c00f4/m.jpg" /></span>
 </xmp>
 
 <xmp id="tumblr" load="TUMBLR.load">

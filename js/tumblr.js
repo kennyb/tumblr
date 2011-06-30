@@ -284,4 +284,4 @@ TUMBLR = {
 		SKIN.set_global('tumblr.'+type+'.total', total);
 		//SKIN.set_global('tumblr.about', telescopic("greetings! [my name is|they call me on earth] [kenny|!![kenneth|kenneth edward bentley, by birth]..]. thank you"));
 	}
-}
+};

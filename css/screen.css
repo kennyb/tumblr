@@ -70,6 +70,30 @@ td {
   /*overflow: hidden;*/
 
 }
+h1 {
+  font-size: 200%;
+}
+h2 {
+  font-size: 150%;
+}
+em {
+  font-style: italic;
+}
+.tywowd_input {
+  padding-top: 11px;
+  clear: both;
+}
+.ttywowd {
+  width: 400px;
+}
+.tywowd li {
+  display: inline;
+  padding-left: 11px;
+}
+.tywowd li:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
 .controls {
   clear: both;
   float: left;
@@ -90,7 +114,7 @@ td {
 }
 .menu li {
   display: inline;
-  padding-left: 10px;
+  padding-left: 11px;
 }
 .menu li:hover {
   text-decoration: underline;

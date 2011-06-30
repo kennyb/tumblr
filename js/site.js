@@ -67,7 +67,7 @@ var SKIN = {
 			i,	e;
 		
 		if(els && (i = els.length - 1) >= 0) {
-			console.log("set global "+k, v);
+			//console.log("set global "+k, v);
 			do {
 				e = els[i];
 				if(force || LIB.inDom(e)) {
@@ -82,8 +82,7 @@ var SKIN = {
 						LIB.show(e);
 					}
 				} else {
-					console.log("removing global "+k, e);
-					console.trace();
+					//console.log("removing global "+k, e);
 					SKIN.globals[k].splice(i, 1);
 				}
 			} while(i--);
@@ -469,7 +468,6 @@ var SKIN = {
 			}
 		}
 		
-		//console.trace();
 		if(typeof(error = data["$error"]) !== 'undefined') {
 			data = Mixin(data, common);
 			output = cE("error", 0, error);
@@ -523,22 +521,28 @@ var SKIN = {
 			element = SKIN.global("gallery."+template_id, cE("div", 0, "Loading...")),
 			render_callback = function(template_id) {
 				var lib = {
-					fetch: function() {
+					fetch: function(rerender) {
 						if(!lib.fetching) {
 							lib.fetching = true;
-							console.log("fetching ON");
-							fetch_func.apply(this, arguments);
+							if(rerender) {
+								fetch_func(lib.start_offset, lib.end_offset, render_func);
+							} else {
+								fetch_func.apply(this, arguments);
+							}
 						}
 					},
 					render: function() {
 						lib.fetching = false;
-						console.log("fetching OFF");
 						render_func.apply(this, arguments);
 					},
 					start_offset: start_offset,
 					end_offset: end_offset,
 					page_size: page_size,
 					page_total: page_total,
+					add: function(obj) {
+						lib.page_total++;
+						lib.render([obj], 1);
+					},
 					total: function(v) {
 						if(typeof v !== 'undefined') {
 							lib.page_total = v;
@@ -594,7 +598,7 @@ var SKIN = {
 				
 				// render_callback
 				return function(start_offset, end_offset, data) {
-					console.log("render_callback", "gallery."+template_id, data);
+					//console.log("render_callback", "gallery."+template_id, data);
 					SKIN.set_global("gallery."+template_id, SKIN.template(template_id, lib), 1);
 					render_func(start_offset, end_offset, data);
 				};
@@ -682,8 +686,8 @@ var SKIN = {
 		
 		// I know that if onfocus is not set, this is a waste of memory... don't care right now.
 		opts.onfocus = function(onfocus) {
-			return function() {
-				onfocus && onfocus();
+			return function(e) {
+				onfocus && onfocus(e);
 				if(this.value == _default_text) {
 					this.className = _active_class;
 					this.value = '';
@@ -700,6 +704,18 @@ var SKIN = {
 				}
 			};
 		}(opts.onblur);
+		
+		opts.onkeyup = function(onkeyup, onsubmit) {
+			return function(e) {
+				onkeyup && onkeyup.call(this, e);
+				if(e.keyCode == 13) {
+					if(onsubmit && !onsubmit.call(this, e)) {
+						this.value = '';
+						this.blur();
+					}
+				}
+			}
+		}(opts.onkeyup, opts.onsubmit);
 		
 		return cE('input', opts);
 	}
